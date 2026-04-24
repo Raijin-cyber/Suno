@@ -1,0 +1,17 @@
+{
+  "name": "suno-backend",
+  "version": "1.0.0",
+  "description": "This is the backend service for a chat application called suno.",
+  "license": "MIT",
+  "author": "Ujjwal Sharma",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
