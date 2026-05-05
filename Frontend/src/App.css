@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+input:-webkit-autofill {
+  background-color: transparent;
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+  -webkit-text-fill-color: black; /* keep text color consistent */
+}
+
+input:-webkit-autofill:focus {
+  background-color: transparent;
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+}
