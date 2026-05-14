@@ -1,6 +1,6 @@
 import express from "express";
 import validateToken from "../middlewares/validateToken.js";
-import { registerUser, loginUser, refreshToken, logoutUser, updateUser, deleteUser } from "../controllers/authControllers.js";
+import { registerUser, loginUser, getCurrentUser, refreshToken, logoutUser, updateUser, deleteUser } from "../controllers/authControllers.js";
 
 const authRoutes = express.Router();
 
@@ -12,7 +12,9 @@ authRoutes.route("/login").post(loginUser)
 authRoutes.route("/refresh").post(refreshToken) 
 
 // applying a middleware, all request will first go through this middleware
-authRoutes.use(validateToken);
+authRoutes.use(validateToken)
+
+authRoutes.route("/curruser").get(getCurrentUser) // a user can exist with an expired token
 
 authRoutes.route("/logout").post(logoutUser)
 

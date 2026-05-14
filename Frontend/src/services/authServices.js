@@ -3,8 +3,8 @@
 // Ultimately these methods will talk to the server and feed the result to the UI
 // And take data from the UI and send it to the backend
 
-import axios from "axios";
 import { AUTH_API } from "../config/config";
+import api from "../utils/axios";
 
 // @ desc: POST register user 
 const registerUser = async(username, email, password) => {
@@ -13,7 +13,7 @@ const registerUser = async(username, email, password) => {
 
         // TODO: Add two keys one private and other is public. Store private to user's device and send the public key to the server
 
-        const newUser = await axios.post(AUTH_API.register, {username, email, password, publicKey: "xcvxcvxvsdczsd"});
+        const newUser = await api.post(AUTH_API.register, {username, email, password, publicKey: "xcvxcvxvsdczsd"});
         if(newUser) console.log("New user created successfully", newUser);
     } catch (error) {
         console.error("Invalid response or request", error);
@@ -24,7 +24,7 @@ const registerUser = async(username, email, password) => {
 const loginUser = async(email, password) => {
     try {
         if(!email || !password) console.error("Email or password missing!");
-        const response = await axios.post(AUTH_API.login, {email, password});
+        const response = await api.post(AUTH_API.login, {email, password}, {withCredentials: true});
 
         // TODO: Store the access, refresh, private key on the client-side
         
@@ -38,7 +38,44 @@ const loginUser = async(email, password) => {
     }
 }
 
+// @ desc: GET gets current user
+const getCurrentUser = async() => {
+    try {
+        return await api.get(AUTH_API.curruser, {withCredentials: true});
+            
+    } catch (error) {
+        console.error("Invalid response or request", error);
+        throw error;
+    }
+}
+
+// @ desc: POST get an access token
+const getAccessToken = async() => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+
+// @ desc: POST logs-out user
+const logoutUser = async() => {
+    try {
+        const response = await api.post(AUTH_API.logout, {withCredentials: true});
+        if(response) {
+            console.log("User logged-out successfully", response);
+            return response;
+        }
+    } catch (error) {
+        console.error("Failed to log-out");
+        throw error;
+    }
+}
+
 export {
     registerUser,
-    loginUser
+    loginUser,
+    getCurrentUser,
+    getAccessToken,
+    logoutUser
 }

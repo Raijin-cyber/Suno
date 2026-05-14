@@ -1,10 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useSocket } from "../hooks/useSocket";
+import { getCurrentUser, logoutUser } from "../services/authServices";
+import { login, logout } from "../store/authSlice";
+import { useNavigate } from "react-router-dom";
 import Chatsnippet from "../components/Chatsnippet";
+
 
 const Home = () => {
     const [ alert, setAlert ] = useState(true);
+    const socket = useSocket();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const logoutHandler = () => {
+        logoutUser()
+        .then((response) => {
+            socket.disconnect();
+            dispatch(logout());
+            navigate("/");
+            console.log("User logged out successfully");
+        });
+    }
+
     const recipientName = ["Sejal", "Sejal", "Sejal", "Sejal", "Sejal", "Sejal", "Sejal", "Sejal", "Sejal", "Sejal", "Sejal", "Sejal", "Sejal", "Sejal"];
-    
+
     return (
         <div className="flex flex-col gap-y-3 px-4 py-3">
             
@@ -12,6 +32,7 @@ const Home = () => {
             <div className="flex justify-between items-center">
                 <span className="text-3xl lg:text-5xl font-semibold font-sans">Chats</span>
                 <div className="flex gap-x-2 h-9 lg:h-12 w-auto">
+                    <button onClick={logoutHandler}><img className="active:bg-black/20 rounded-full p-1 transition duration-75" src="/assets/icons/exit.png" /></button>
                     <img onClick={() => setAlert(prev => !prev)} className="active:bg-black/20 rounded-full p-1 transition duration-75" src={`/assets/icons/${alert ? "ring" : "silent"}.png`} />
                     <img className="active:bg-black/20 rounded-full p-1 transition duration-75" src="/assets/icons/dots.png" />
                 </div>

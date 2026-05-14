@@ -1,32 +1,55 @@
-// Routes
+// App.jsx
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { login, logout } from "./store/authSlice";
+import { getCurrentUser } from "./services/authServices";
+import Conversation from "./pages/Conversation";
+import { Auth, Welcome, About, Home, ErrorPage } from "./pages/pageImports";
+import ProtectedRoute from "./components/ProtectedRoute";
 import errorHandler from "./utils/errorHandler";
-import { Auth, Welcome, About, Home } from "./pages/pageImports";
+import { useSocket } from "./hooks/useSocket";
 
-const appRoutes = new createBrowserRouter([
-  {
-    path: "/",
-    element: <Welcome/>
-  },
-  {
-    path: "/auth",
-    element: <Auth/>
-  },
-  {
-    path: "/about",
-    element: <About/>
-  },
+const appRoutes = createBrowserRouter([
+  { path: "/", element: <Welcome /> },
+  { path: "/auth", element: <Auth /> },
+  { path: "/about", element: <About /> },
   {
     path: "/home",
-    element: <Home/>
-  }
-])
+    element: (
+      <ProtectedRoute>
+        <Home />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/convo/:id",
+    element: (
+      <ProtectedRoute>
+        <Conversation />
+      </ProtectedRoute>
+    ),
+    errorElement: <ErrorPage />,
+  },
+]);
 
 function App() {
-  return (
-    // An error handler function that will be called for any middleware, loader, action, or render errors that are encountered in your application.
-    <RouterProvider onError={errorHandler} router={appRoutes} /> 
-  )
+  const dispatch = useDispatch();
+  const socket = useSocket();
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((res) => {
+        dispatch(login({ userData: res.data.userData }));
+        socket.connect();
+      })
+      .catch((err) => {
+        console.error("Error verifying session:", err);
+        dispatch(logout());
+      });
+  }, [dispatch]);
+
+  return <RouterProvider router={appRoutes} onError={errorHandler} />;
 }
 
 export default App;

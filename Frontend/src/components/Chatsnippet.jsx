@@ -1,6 +1,16 @@
-const Chatsnippet = ({recipientAvatar, recipientName, lastMessage, lastMessageTime, UnreadMessageCount}) => {
+import { useSocket } from "../hooks/useSocket";
+import { roomJoinEvent } from "../socket/chat";
+import { useNavigate } from "react-router-dom";
+
+const Chatsnippet = ({conversationId = "123", recipientAvatar, recipientName, lastMessage, lastMessageTime, UnreadMessageCount}) => {
+    const socket = useSocket();
+    const navigate = useNavigate();
+    const roomHandler = () => {
+        navigate(`/convo/${conversationId}`);
+    }
+
     return(
-        <div className="flex items-center justify-between w-full hover:bg-black/20 active:bg-black/20 p-2 rounded-2xl transition duration-100">
+        <div onClick={roomHandler} className="flex items-center justify-between w-full hover:bg-black/20 active:bg-black/20 p-2 rounded-2xl transition duration-100">
             <div className="flex items-center gap-3">
                 {/* Avatar */}
                 <div className="w-12 h-auto">

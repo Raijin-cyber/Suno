@@ -94,20 +94,61 @@ const loginUser = asyncHandler(async(req, res, next) => {
         res.cookie("refreshToken", refreshToken,
             {
                 httpOnly: true,
-                secure: true,
-                sameSite: "strict",
+                secure: false,
+                sameSite: "lax",
                 maxAge: 7 * 24 * 60 * 60 * 1000
+            }
+        )
+        res.cookie("accessToken", accessToken,
+            {
+                httpOnly: true,
+                secure: false,
+                sameSite: "lax",
+                maxAge: 15 * 60 * 1000
             }
         )
         res.json({
             success: true,
             message: "Successfully logged in.",
-            accessToken: accessToken,
+            userData: {
+                _id: user._id,
+                username: user.username,
+            }
         })
     }   
     else {
         res.status(401);
         throw new Error("Invalid email or password.");
+    }
+})
+
+//@desc verify if the user is authenticated
+//@route " POST /api/auth/curruser"
+//@access public
+const getCurrentUser = asyncHandler(async(req, res, next) => {
+    const refToken = req.cookies.refreshToken;
+
+    if(refToken){
+        jwt.verify(refToken, process.env.REFRESH_TOKEN_SECRET, 
+            (err, decoded) => {
+                if(err) {
+                    res.status(401);
+                    throw new Error("Token missing, invalid or expired.");
+                }
+
+                const user = decoded.user;
+                res.status(200);
+                res.json({
+                    success: true,
+                    message: "User is verified!",
+                    userData: user,
+                });
+            }
+        );
+    }
+    else{
+        res.status(401);
+        throw new Error("Token missing, invalid or expired.");
     }
 })
 
@@ -147,6 +188,13 @@ const refreshToken = asyncHandler(async(req, res, next) => {
 //@access private
 const logoutUser = asyncHandler(async(req, res, next) => {
     res.clearCookie("refreshToken", 
+        {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+        }
+    );
+    res.clearCookie("accessToken", 
         {
             httpOnly: true,
             secure: true,
@@ -247,6 +295,7 @@ const deleteUser = asyncHandler(async(req, res, next) => {
 export {
     registerUser,
     loginUser,
+    getCurrentUser,
     refreshToken,
     logoutUser,
     updateUser,

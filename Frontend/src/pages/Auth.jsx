@@ -1,15 +1,24 @@
 // auth
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import reqMsgHandler from "../utils/reqMsgHandler";
 import Form from "../components/Form";
 import { useNavigate } from "react-router-dom";
 import { registerUser, loginUser } from "../services/authServices";
+import { useDispatch, useSelector } from "react-redux";
+import { login, logout } from "../store/authSlice";
 
 const Auth = () => {
     const [authMode, setAuthMode] = useState("login");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const status = useSelector((state) => state.auth.status);
+
+    useEffect(() => {
+        status && navigate("/home");
+    }, [])
 
     const registerFormHandler = (formData) => {
         setIsLoading(true);
@@ -32,7 +41,10 @@ const Auth = () => {
         loginUser(email, password)
         .then((res) => {
             setIsLoading(false);
-            if (res.status === 200 || res.status === 201 || res.status === 204) navigate("/home");
+            if (res.status >= 200 && res.status < 300) {
+                dispatch(login({userData: res.data.userData}));    
+                navigate("/home");
+            }
         })
         .catch((err) => {
             setError(reqMsgHandler(err.status));
