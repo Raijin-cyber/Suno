@@ -34,10 +34,10 @@ configSocket(io); // configuing the web socket connection
 app.use(cors({origin: "http://localhost:5173", credentials: true}));
 app.use(express.json()); // to parse all incoming request with valid JSON data type will be eventually converted to the JSON format.
 app.use(cookieParser());
-app.use("/auth", authRoutes);
+app.use("/api/v1/auth", authRoutes);
 
 // start the http server only if the database is ready to connect
 connectDB()
 .then(() => {
-    httpServer.listen(PORT, () => console.log(`Server is listening on http://localhost:${PORT}`));
+    httpServer.listen(PORT, () => console.log(`Server is listening on http://localhost:${PORT}/api/v1`));
 });

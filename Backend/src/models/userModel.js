@@ -18,10 +18,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    blockedUser: [{
-        type: mongoose.Schema.Types.ObjectId,
+    blockedUser: {
+        type: [mongoose.Schema.Types.ObjectId],
         ref: "User",
-    }]
+    }
 },
     {
         timestamps: true

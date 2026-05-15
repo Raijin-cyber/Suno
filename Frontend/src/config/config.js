@@ -9,7 +9,3 @@ export const AUTH_API = {
     update: API_BASE_URL + "auth/update",
     delete: API_BASE_URL + "auth/delete"
 }
-
-export const SOCKET_API = {
-        
-}

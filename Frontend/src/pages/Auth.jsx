@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { registerUser, loginUser } from "../services/authServices";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "../store/authSlice";
+import { useSocket } from "../hooks/useSocket";
 
 const Auth = () => {
     const [authMode, setAuthMode] = useState("login");
@@ -13,6 +14,7 @@ const Auth = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const socket = useSocket();
 
     const status = useSelector((state) => state.auth.status);
 
@@ -27,6 +29,7 @@ const Auth = () => {
         .then(() => {
             loginUser(email, password)
             .then(() => {
+                if(!socket.connected) socket.connect();
                 setIsLoading(false);
                 navigate("/home");
             })
@@ -42,7 +45,8 @@ const Auth = () => {
         .then((res) => {
             setIsLoading(false);
             if (res.status >= 200 && res.status < 300) {
-                dispatch(login({userData: res.data.userData}));    
+                dispatch(login({userData: res.data.userData}));
+                if(!socket.connected) socket.connect();    
                 navigate("/home");
             }
         })
