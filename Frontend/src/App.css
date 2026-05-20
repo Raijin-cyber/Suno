@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+html,
+body,
+#root {
+  min-height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
 input:-webkit-autofill {
   background-color: transparent;
   -webkit-box-shadow: 0 0 0px 1000px transparent inset;
@@ -9,4 +17,12 @@ input:-webkit-autofill {
 input:-webkit-autofill:focus {
   background-color: transparent;
   -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 }

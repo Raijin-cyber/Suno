@@ -9,7 +9,7 @@ import asyncHandler from "../utilities/asyncHandler.js"
 // *** throw new Error(message) *** this line will immediately reject the ongoing promise and the error will be forwarded to the our errorHandler middleware
 
 //@desc Register a user
-//@route " POST /api/auth/register"
+//@route " POST /api/v1/auth/register"
 //@access public
 const registerUser = asyncHandler(async(req, res, next) => {
     const {username, email, password, publicKey} = req.body
@@ -49,7 +49,7 @@ const registerUser = asyncHandler(async(req, res, next) => {
 })
 
 //@desc Login a user
-//@route " POST /api/auth/login"
+//@route " POST /api/v1/auth/login"
 //@access public
 const loginUser = asyncHandler(async(req, res, next) => {
     const { email, password } = req.body;
@@ -123,7 +123,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
 })
 
 //@desc verify if the user is authenticated
-//@route " POST /api/auth/curruser"
+//@route " POST /api/v1/auth/curruser"
 //@access public
 const getCurrentUser = asyncHandler(async(req, res, next) => {
     const refToken = req.cookies.refreshToken;
@@ -153,7 +153,7 @@ const getCurrentUser = asyncHandler(async(req, res, next) => {
 })
 
 //@desc provides a new access token based on refresh token
-//@route " POST /api/auth/refresh"
+//@route " POST /api/v1/auth/refresh"
 //@access public
 const refreshToken = asyncHandler(async(req, res, next) => {
     const refToken = req.cookies.refreshToken;
@@ -169,10 +169,17 @@ const refreshToken = asyncHandler(async(req, res, next) => {
                 const user = decoded.user;
                 const newAccessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
                 res.status(200);
+                res.cookie("accessToken", newAccessToken,
+                    {
+                        httpOnly: true,
+                        secure: false,
+                        sameSite: "lax",
+                        maxAge: 15 * 60 * 1000
+                    }
+                )
                 res.json({
                     success: true,
                     message: "Access token generated successfully.",
-                    accessToken: newAccessToken
                 });
             }
         );
@@ -184,7 +191,7 @@ const refreshToken = asyncHandler(async(req, res, next) => {
 })
 
 //@desc Logout a user
-//@route " POST /api/auth/logout"
+//@route " POST /api/v1/auth/logout"
 //@access private
 const logoutUser = asyncHandler(async(req, res, next) => {
     res.clearCookie("refreshToken", 
@@ -211,7 +218,7 @@ const logoutUser = asyncHandler(async(req, res, next) => {
 })
 
 //@desc Update a user
-//@route " POST /api/auth/update"
+//@route " POST /api/v1/auth/update"
 //@access private
 const updateUser = asyncHandler(async(req, res, next) => {
     const { email } = req.body;
@@ -242,7 +249,7 @@ const updateUser = asyncHandler(async(req, res, next) => {
 })
 
 //@desc Delete a user
-//@route " POST /api/auth/delete"
+//@route " POST /api/v1/auth/delete"
 //@access private
 const deleteUser = asyncHandler(async(req, res, next) => {    
     const { email, password } = req.body;

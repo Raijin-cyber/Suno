@@ -57,19 +57,29 @@ const Auth = () => {
     }
 
     return(
-        <div className="flex flex-col justify-center items-center">
-            {/* images */}
-            {authMode === "login" && <div className=""><img className="h-96 w-full" src="/assets/illustrations/ch4.jpg" /></div>}
-            {authMode === "createAccount" && <div className=""><img className="h-85 w-full" src="/assets/illustrations/ch6.jpg" /></div>}
-            
-            {/* error message */}
-            {error && <span className="text-red-800 text-xs font-semibold">{error}</span>}
+        <div className="flex items-center justify-center h-screen">
+            <div className="relative flex flex-col lg:flex-row scale-75 sm:scale-80 lg:scale-90 space-y-3 lg:space-x-15 items-center rounded-3xl p-10 bg-[#fc94Af] shadow-[inset_3px_3px_6px_#fa4f7b,inset_-3px_-3px_2px_#fed9e3]">
+                {/* images */}
+                {authMode === "login" && <div className="flex justify-center items-center"><img className="h-96 w-full" src="/assets/illustrations/Team work-bro.png" /></div>}
+                {authMode === "createAccount" && <div className="flex justify-center items-center"><img className="h-85 w-full" src="/assets/illustrations/Team work-bro2.png" /></div>}
+                
+                {/* error message */}
+                {error && <span className="absolute top-6 left-1/2 transform -translate-x-1/2 text-red-800 text-xs font-semibold">{error}</span>}
 
-            {/* Register */}
-            {authMode === "createAccount" && <Form onSubmitHandler={registerFormHandler} loadingState={isLoading} onSendAuthMode={setAuthMode} username={true} email={true} password={true}/>}
+                {/* Register */}
+                {authMode === "createAccount" && 
+                    <div className="pt-10 backdrop-blur-[1.5px] backdrop-saturate-200% bg-[rgba(244,244,244,0.3)] border border-[rgba(255,255,255,0.1)] p-6 shadow-lg rounded-3xl">
+                        <Form onSubmitHandler={registerFormHandler} loadingState={isLoading} onSendAuthMode={setAuthMode} username={true} email={true} password={true}/>
+                    </div>
+                }
 
-            {/* Login */}
-            {authMode === "login" && <Form onSubmitHandler={loginFormHandler} loadingState={isLoading} onSendAuthMode={setAuthMode} email={true} password={true}/>}
+                {/* Login */}
+                {authMode === "login" && 
+                    <div className="backdrop-blur-[1.5px] backdrop-saturate-200% bg-[rgba(244,244,244,0.3)] border border-[rgba(255,255,255,0.1)] p-6 shadow-lg rounded-3xl">
+                        <Form onSubmitHandler={loginFormHandler} loadingState={isLoading} onSendAuthMode={setAuthMode} email={true} password={true}/>
+                    </div>
+                }
+            </div>
         </div>
     )
 }

@@ -111,8 +111,8 @@ const Form = ({ onSubmitHandler, loadingState, onSendAuthMode, username, email, 
             
             {username && <p className="text-black/50">Already have an account?<span className="underline hover:text-black active:text-black ml-1 cursor-pointer" onClick={() => onSendAuthMode("login")}>Login</span></p>}
             {!username && <p className="text-black/50">Don't have an account?<span className="underline hover:text-black active:text-black ml-1 cursor-pointer" onClick={() => onSendAuthMode("createAccount")}>Create</span></p>}
-            {!loadingState && <button type="submit" disabled={!isFilled} className={`bg-[#ec6340] py-2 font-semibold font-sans text-white rounded-xl text-xl transition duration-75 ${!isFilled ? `opacity-75` : `opacity-100 active:scale-97`}`}>{username ? "Create Account" : "Login"}</button>}
-            {loadingState && <button type="submit" disabled={!isFilled} className={`bg-[#ec6340] py-2 font-semibold font-sans text-white rounded-xl text-xl transition duration-75 ${!isFilled ? `opacity-75` : `opacity-100 active:scale-97`}`}><div className="flex justify-center items-center w-full"><img className="w-7 h-auto animate-spin" src="/assets/icons/Rolling@1x-1.0s-200px-200px.svg" /></div></button>}
+            {!loadingState && <button type="submit" disabled={!isFilled} className={`bg-[#D6336C]/90 shadow-2xl py-2 font-semibold font-sans text-white rounded-xl text-xl transition duration-75 ${!isFilled ? `opacity-75` : `opacity-100 active:scale-97`}`}>{username ? "Create Account" : "Login"}</button>}
+            {loadingState && <button type="submit" disabled={!isFilled} className={`bg-[#D6336C]/90 shadow-2xl py-2 font-semibold font-sans text-white rounded-xl text-xl transition duration-75 ${!isFilled ? `opacity-75` : `opacity-100 active:scale-97`}`}><div className="flex justify-center items-center w-full"><img className="w-7 h-auto animate-spin" src="/assets/icons/Rolling@1x-1.0s-200px-200px.svg" /></div></button>}
         </form>
     )
 }
