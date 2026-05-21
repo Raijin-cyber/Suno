@@ -1,3 +1,5 @@
+// NOTE*** Remove this default conversation ID
+
 import { useSocket } from "../hooks/useSocket";
 import { roomJoinEvent } from "../socket/chat";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +8,7 @@ const Chatsnippet = ({conversationId = "123", recipientAvatar, recipientName, la
     const socket = useSocket();
     const navigate = useNavigate();
     const roomHandler = () => {
-        navigate(`/convo/${conversationId}`);
+        navigate(`/home/convo/${conversationId}`);
     }
 
     return(

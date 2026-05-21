@@ -21,15 +21,17 @@ const appRoutes = createBrowserRouter([
         <Home />
       </ProtectedRoute>
     ),
-  },
-  {
-    path: "/convo/:id",
-    element: (
-      <ProtectedRoute>
-        <Conversation />
-      </ProtectedRoute>
-    ),
-    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "convo/:id",
+        element: (
+          <ProtectedRoute>
+            <Conversation />
+          </ProtectedRoute>
+        ),
+        errorElement: <ErrorPage />,
+      },
+    ],
   },
 ]);
 

@@ -15,6 +15,11 @@ const messageSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    referenceMessage: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message", // points to another message
+        default: null,
+    },
     IsEdited: {
         type: Boolean,
         default: false,

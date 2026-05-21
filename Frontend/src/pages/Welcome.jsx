@@ -60,7 +60,7 @@ const Welcome = () => {
                         <i className="md:text-xl block md:text-left text-center tracking-tighter">A modern chat experience designed for simplicity, speed, and style — where every conversation feels personal and polished.</i>
                     </div>
                     {/* Mobile phone */}
-                    <div class="md:self-end md:scale-120 overflow-y-scroll scrollbar-hide overflow-x-hidden scrollbar-hide relative flex flex-col items-center h-100 w-60 px-3 rounded-[25px] bg-[#fc94af] border">
+                    <div className="md:self-end md:scale-120 overflow-y-scroll scrollbar-hide overflow-x-hidden scrollbar-hide relative flex flex-col items-center h-100 w-60 px-3 rounded-[25px] bg-[#fc94af] border">
                         {/* top panel */}
                         <div className="sticky top-3 flex items-center justify-between rounded-2xl w-55 h-14 py-2 px-2 backdrop-blur-[1.5px] backdrop-saturate-200% bg-[rgba(244,244,244,0.3)] border border-[rgba(255,255,255,0.1)]">
                             <div className="flex items-center gap-x-3">
@@ -76,6 +76,8 @@ const Welcome = () => {
                                 <div className="rounded-full object-cover h-3 w-3"><img src="/assets/icons/dots.png" alt="Panda" /></div>
                             </div>
                         </div>
+
+                        {/* chats panel */}
                         <div className="flex flex-col py-3 space-y-4 scrollbar-hide w-full my-3 px-1">
                             {messages.map((msg, index) => (
                                 <span

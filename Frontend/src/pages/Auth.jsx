@@ -5,7 +5,7 @@ import Form from "../components/Form";
 import { useNavigate } from "react-router-dom";
 import { registerUser, loginUser } from "../services/authServices";
 import { useDispatch, useSelector } from "react-redux";
-import { login, logout } from "../store/authSlice";
+import { login } from "../store/authSlice";
 import { useSocket } from "../hooks/useSocket";
 
 const Auth = () => {
@@ -58,7 +58,7 @@ const Auth = () => {
 
     return(
         <div className="flex items-center justify-center h-screen">
-            <div className="relative flex flex-col lg:flex-row scale-75 sm:scale-80 lg:scale-90 space-y-3 lg:space-x-15 items-center rounded-3xl p-10 bg-[#fc94Af] shadow-[inset_3px_3px_6px_#fa4f7b,inset_-3px_-3px_2px_#fed9e3]">
+            <div className="relative flex flex-col lg:flex-row scale-75 sm:scale-80 lg:scale-90 space-y-3 lg:space-x-15 items-center rounded-3xl p-10 bg-[#fc94Af] shadow-[inset_6px_6px_5px_#de829a,inset_-6px_-6px_5px_#ffa6c4]">
                 {/* images */}
                 {authMode === "login" && <div className="flex justify-center items-center"><img className="h-96 w-full" src="/assets/illustrations/Team work-bro.png" /></div>}
                 {authMode === "createAccount" && <div className="flex justify-center items-center"><img className="h-85 w-full" src="/assets/illustrations/Team work-bro2.png" /></div>}
