@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { login, logout } from "./store/authSlice";
 import { getCurrentUser } from "./services/authServices";
 import Conversation from "./pages/Conversation";
-import { Auth, Welcome, About, Home, ErrorPage } from "./pages/pageImports";
+import { Auth, Welcome, About, Home, UserSearchPage, ErrorPage } from "./pages/pageImports";
 import ProtectedRoute from "./components/ProtectedRoute";
 import errorHandler from "./utils/errorHandler";
 import { useSocket } from "./hooks/useSocket";
@@ -30,6 +30,15 @@ const appRoutes = createBrowserRouter([
           </ProtectedRoute>
         ),
         errorElement: <ErrorPage />,
+      },
+      {
+        path: "srchuser/:mode",
+        element: (
+          <ProtectedRoute>
+            <UserSearchPage />
+          </ProtectedRoute>
+        ),
+        errorElement: <ErrorPage />
       },
     ],
   },

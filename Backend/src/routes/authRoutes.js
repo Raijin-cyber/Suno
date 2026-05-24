@@ -1,6 +1,6 @@
 import express from "express";
 import validateToken from "../middlewares/validateToken.js";
-import { registerUser, loginUser, getCurrentUser, refreshToken, logoutUser, updateUser, deleteUser } from "../controllers/authControllers.js";
+import { registerUser, loginUser, getCurrentUser, refreshToken, logoutUser, updateUser, deleteUser, searchUser } from "../controllers/authControllers.js";
 
 const authRoutes = express.Router();
 
@@ -21,5 +21,7 @@ authRoutes.route("/logout").post(logoutUser)
 authRoutes.route("/update").put(updateUser)
 
 authRoutes.route("/delete").delete(deleteUser)
+
+authRoutes.route("/search").get(searchUser)
 
 export default authRoutes;

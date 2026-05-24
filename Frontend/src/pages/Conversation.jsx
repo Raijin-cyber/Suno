@@ -54,7 +54,7 @@ const Conversation = () => {
               <div onClick={handleCloseConversation} className="md:hidden cursor-pointer rounded-full active:bg-black/20 transition duration-120 object-cover"><img src="/assets/icons/back.png" alt="" /></div>
               <div className="cursor-pointer rounded-full object-cover h-10 w-10 md:h-15 md:w-15"><img src="/assets/icons/user.png" alt="Panda" /></div>
               <div className="flex flex-col items-start">
-                  <span className="text-[1.10rem] md:text-xl tracking-tight">Sejal</span>
+                  <span className="text-[1.10rem] md:text-xl tracking-tight">JOJO</span>
                   <span className="text-[0.8rem] md:text-xs font-light tracking-tight">Online</span>
               </div>
           </div>
@@ -71,7 +71,7 @@ const Conversation = () => {
       </div>
 
       {/* ####### Chats ####### */}
-      <div id="chat-area" className="w-full my-6 px-5 flex-1">
+      <div id="chat-area" className="w-full my-6 mt-12 px-5 flex-1">
         <div className="flex flex-col gap-y-2">
           {chats.map((chat, index) => (
             <Chat key={index} msg={chat.message} isOwn={chat.isOwn} time={chat.time} />

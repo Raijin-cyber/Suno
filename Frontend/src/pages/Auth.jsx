@@ -19,8 +19,10 @@ const Auth = () => {
     const status = useSelector((state) => state.auth.status);
 
     useEffect(() => {
-        status && navigate("/home");
-    }, [])
+        if(status) {
+            navigate("/home");
+        }
+    }, [status])
 
     const registerFormHandler = (formData) => {
         setIsLoading(true);

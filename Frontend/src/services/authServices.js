@@ -72,10 +72,21 @@ const logoutUser = async() => {
     }
 }
 
+// @ desc: POST searches for a user by their username
+const searchUser = async(username) => {
+    try {
+        const response = await api.get(AUTH_API.search + username, { withCredentials: true });
+        return response.data.results;
+    } catch (error) {
+        console.error("Error occured while querying the user", error);
+    }
+}
+
 export {
     registerUser,
     loginUser,
     getCurrentUser,
     getAccessToken,
-    logoutUser
+    logoutUser,
+    searchUser
 }

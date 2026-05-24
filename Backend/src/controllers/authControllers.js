@@ -299,6 +299,33 @@ const deleteUser = asyncHandler(async(req, res, next) => {
     }
 })
 
+//@desc Search a user in the DB
+//@route " POST /api/v1/auth/search?query=username"
+//@access private
+const searchUser = asyncHandler(async(req, res, next) => {
+    const { query } = req.query;
+
+    if(!query || query.trim() === '') {
+        res.status(400);
+        throw new Error("Bad Request: Search query is required");
+    }
+
+    const results = await User.find(
+        {username: {$regex: `^${query}`, $options: 'i'}}
+    ).select('_id avatar username').limit(10);
+
+    if(!results) {
+        res.status(400);
+        throw new Error("Something went wrong while querying");
+    }
+
+    res.status(200);
+    res.json({
+        success: true,
+        results: results
+    });
+})
+
 export {
     registerUser,
     loginUser,
@@ -306,5 +333,6 @@ export {
     refreshToken,
     logoutUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    searchUser
 }

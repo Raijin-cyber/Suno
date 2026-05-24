@@ -12,6 +12,7 @@ import connectDB from "./database/dbConnection.js";
 import authRoutes from "./src/routes/authRoutes.js";
 import convoRoutes from "./src/routes/convoRoutes.js";
 import messageRoutes from "./src/routes/messageRoutes.js";
+import requestRoutes from "./src/routes/requestRoutes.js";
 
 configDotenv(); // loads .env's content in process.env
 
@@ -38,6 +39,7 @@ app.use(cookieParser());
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/convo", convoRoutes);
 app.use("/api/v1/message", messageRoutes);
+app.use("/api/v1/request", requestRoutes);
 
 // start the http server only if the database is ready to connect
 connectDB()

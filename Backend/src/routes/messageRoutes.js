@@ -4,6 +4,8 @@ import { createMessage, getMessage, updateMessage, deleteMessage } from "../cont
 
 const messageRoutes = express.Router();
 
+messageRoutes.use(validateToken);
+
 messageRoutes.route("/:id/create").post(createMessage);
 
 messageRoutes.route("/:id/get").get(getMessage);
