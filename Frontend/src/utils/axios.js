@@ -13,10 +13,8 @@ const api = axios.create({
 
 api.defaults.withCredentials = true;
 
-
-// refreshing access token logic
 api.interceptors.response.use(
-    res => res,
+    response => response,
     async(error) => {
         const org_request = error.config;
 
@@ -26,14 +24,19 @@ api.interceptors.response.use(
                 await axios.post(AUTH_API.refresh, {}, { withCredentials: true });               
                 const response = await axios.get(AUTH_API.curruser, { withCredentials: true });
                 store.dispatch(login(response.data.userData));
-
                 return api(org_request);
 
-            } catch (error) {
+            } catch (refreshError) {
                 store.dispatch(logout());
+                return Promise.reject(refreshError);
             }
         }
-        return Promise.reject(error);
+        
+        if (error.response) {
+            return Promise.reject(error.response.data.message);
+        } else {
+            return Promise.reject(error.message);
+        }
     }
 )
 

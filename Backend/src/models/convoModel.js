@@ -19,6 +19,9 @@ const convoSchema = new mongoose.Schema({
     admin: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+    },
+    avatar: {
+        type: String
     }
 }, 
     {

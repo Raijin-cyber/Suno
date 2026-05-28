@@ -28,5 +28,12 @@ export const MESSAGE_API = {
 export const REQUEST_API = {
     send: API_BASE_URL + "request/send",
     accept: API_BASE_URL + "request/accept",
+    status: API_BASE_URL + "request/status",
     delete: API_BASE_URL + "request/delete",
+}
+
+export const NOTIFICATION_API = {
+    send: API_BASE_URL + "notification/send",
+    receive: API_BASE_URL + "notification/receive",
+    read: API_BASE_URL + "notification/read",
 }

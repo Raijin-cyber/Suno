@@ -44,9 +44,9 @@ const sendRequest = asyncHandler(async(req, res, next) => {
 //@access private
 const acceptRequest = asyncHandler(async(req, res, next) => {
     const { requestID } = req.body;
-    const userID  = req.cookies.userID;
+    const userA_ID  = req.cookies.userA_ID;
 
-    if(!requestID || !userID) {
+    if(!requestID || !userA_ID) {
         res.status(400);
         throw new Error("Bad Request: Request and user IDs are required!");
     }
@@ -56,10 +56,15 @@ const acceptRequest = asyncHandler(async(req, res, next) => {
     if(!request) {
         res.status(404);
         throw new Error("Request not found!");
-    }   
+    }
+    
+    if(request.status === "accepted") {
+        res.status(409)
+        throw new Error("Request already accepted");    
+    }
 
     // authorization check
-    if (request.receiver.toString() !== userID) {
+    if (request.receiver.toString() !== userA_ID) {
         res.status(403);
         throw new Error("Not authorized to accept this request.");
     }
@@ -75,12 +80,40 @@ const acceptRequest = asyncHandler(async(req, res, next) => {
     })
 })
 
+//@desc Fetches request status
+//@route " Delete /api/v1/request/status"
+//@access private
+const getRequestStatus = asyncHandler(async(req, res, next) => {
+    const userA_ID = req.cookies.userA_ID;
+
+    if(!userA_ID) {
+        res.status(400);
+        throw new Error("User ID is required!");
+    }
+
+   const requestStatus = await Request.find({
+        $or: [
+            { sender: userA_ID},
+            { receiver: userA_ID }
+        ]
+    }).select("sender receiver status");
+
+
+    res.status(200);
+    res.json({
+        success: true,
+        message: "Request status fetched successfully",
+        result: requestStatus,
+    })
+})
+
+
 //@desc deletes a request message
 //@route " Delete /api/v1/request/delete"
 //@access private
 const deleteRequest = asyncHandler(async(req, res, next) => {
     const { requestID } = req.body;
-    const userID  = req.cookies.userID;
+    const userA_ID  = req.cookies.userA_ID;
 
     if(!requestID || !userID) {
         res.status(400);
@@ -113,5 +146,6 @@ const deleteRequest = asyncHandler(async(req, res, next) => {
 export {
     sendRequest,
     acceptRequest,
+    getRequestStatus,
     deleteRequest
 }

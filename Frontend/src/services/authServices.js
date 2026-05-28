@@ -16,7 +16,7 @@ const registerUser = async(username, email, password) => {
         const newUser = await api.post(AUTH_API.register, {username, email, password, publicKey: "xcvxcvxvsdczsd"});
         if(newUser) console.log("New user created successfully", newUser);
     } catch (error) {
-        console.error("Invalid response or request", error);
+        console.error("Invalid response or request", error.message);
     }
 }
 
@@ -42,7 +42,6 @@ const loginUser = async(email, password) => {
 const getCurrentUser = async() => {
     try {
         return await api.get(AUTH_API.curruser, {withCredentials: true});
-            
     } catch (error) {
         console.error("Invalid response or request", error);
         throw error;

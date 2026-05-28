@@ -65,7 +65,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
         const accessToken = jwt.sign(
             {
                 user: {
-                    user_id: user._id,
+                    _id: user._id,
                     username: user.username,
                 },
             },
@@ -79,7 +79,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
         const refreshToken = jwt.sign(
             {
                 user: {
-                    user_id: user._id,
+                    _id: user._id,
                     username: user.username,
                 },
             },
@@ -105,6 +105,14 @@ const loginUser = asyncHandler(async(req, res, next) => {
                 secure: false,
                 sameSite: "lax",
                 maxAge: 15 * 60 * 1000
+            }
+        )
+        res.cookie("userA_ID", user._id,
+            {
+                httpOnly: true,
+                secure: false,
+                sameSite: "lax",
+                maxAge: 365 * 24 * 60 * 60 * 1000
             }
         )
         res.json({
@@ -197,15 +205,22 @@ const logoutUser = asyncHandler(async(req, res, next) => {
     res.clearCookie("refreshToken", 
         {
             httpOnly: true,
-            secure: true,
-            sameSite: "strict",
+            secure: false,
+            sameSite: "lax",
         }
     );
     res.clearCookie("accessToken", 
         {
             httpOnly: true,
-            secure: true,
-            sameSite: "strict",
+            secure: false,
+            sameSite: "lax",
+        }
+    );
+    res.clearCookie("userA_ID", 
+        {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
         }
     );
     res.status(200)
@@ -223,7 +238,7 @@ const logoutUser = asyncHandler(async(req, res, next) => {
 const updateUser = asyncHandler(async(req, res, next) => {
     const { email } = req.body;
     const { password } = req.body;
-    const { user_id } = req.user;
+    const { _id } = req.user;
     
     // first hash the incoming password then store it in the database
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -233,7 +248,7 @@ const updateUser = asyncHandler(async(req, res, next) => {
     if(email) updateFields.email = email;
     if(password) updateFields.password = hashedPassword;
 
-    const updatedUser = await User.findByIdAndUpdate(user_id, { $set: updateFields }, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(_id, { $set: updateFields }, { new: true });
     
     res.status(200);
     res.json(
@@ -261,12 +276,12 @@ const deleteUser = asyncHandler(async(req, res, next) => {
 
     if(req.cookies.refreshToken) {
         const decoded = jwt.verify(req.cookies.refreshToken, process.env.REFRESH_TOKEN_SECRET);
-        if(req.user.user_id !== decoded?.user.user_id) {
+        if(req.user._id !== decoded?.user._id) {
             res.status(401);
             throw new Error("Unauthorized");
         }
 
-        const targetUser = await User.findById(req.user.user_id);
+        const targetUser = await User.findById(req.user._id);
         if(!targetUser || !(await bcrypt.compare(password, targetUser.password))) {
             res.status(401);
             throw new Error("Unauthorized");

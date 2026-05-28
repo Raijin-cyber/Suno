@@ -1,5 +1,6 @@
 import Convo from "../models/convoModel.js";
 import User from "../models/userModel.js";
+import Request from "../models/requestModel.js";
 import { v4 as uuidv4 } from "uuid";
 import asyncHandler from "../utilities/asyncHandler.js"
 
@@ -33,6 +34,20 @@ const createConvo = asyncHandler(async(req, res, next) => {
             res.status(403);
             throw new Error("You cannot perform this operation because user is blocked");
         }
+
+        // do a check if a accepted request model exist or not
+        const acceptedRequest = await Request.find(
+            {status: "accepted",
+            $or: [
+                {sender: userA_ID, receiver: userB_ID},
+                {sender: userB_ID, receiver: userA_ID}
+            ]
+        });
+
+        if (!acceptedRequest) {
+            res.status(403);
+            throw new Error("Conversation cannot be created: request is not accepted.");
+        } 
 
         // deterministic convoId
         const convoID = [userA_ID.toString(), userB_ID.toString()].sort().join('_');

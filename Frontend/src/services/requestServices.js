@@ -13,12 +13,22 @@ const sendRequest = async(senderID, receiverID) => {
 }
 
 // @desc accepts a request
-const acceptRequest = async(requestId, userID) => {
+const acceptRequest = async(requestID) => {
     try {
-        const response = await api.put(REQUEST_API.accept, { requestId, userID }, { withCredentials: true });
+        const response = await api.put(REQUEST_API.accept, { requestID }, { withCredentials: true });
         return response.data;
     } catch (error) {
         console.error("Error accepting request: ", error);
+        return error;
+    }
+}
+
+const getRequestStatus = async() => {
+    try {
+        const response = await api.get(REQUEST_API.status, { withCredentials: true });
+        return response.data.result;
+    } catch (error) {
+        console.error("Error getting request status", error);
         return error;
     }
 }
@@ -37,5 +47,6 @@ const deleteRequest = async(requestId, userID) => {
 export {
     sendRequest,
     acceptRequest,
+    getRequestStatus,
     deleteRequest,
 }

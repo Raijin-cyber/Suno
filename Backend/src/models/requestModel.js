@@ -15,8 +15,12 @@ const requestSchema = new mongoose.Schema({
         type: String,
         enum: ["pending", "accepted", "rejected"],
         default: "pending",
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      index: { expires: "7d" } // auto-delete after 7 days
     }
-
 },
 {
     timestamps: true,

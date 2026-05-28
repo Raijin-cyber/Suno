@@ -4,6 +4,7 @@ import { useSocket } from "../hooks/useSocket";
 import { roomJoinEvent } from "../socket/chat";
 import { useNavigate } from "react-router-dom";
 import { sendRequest } from "../services/requestServices";
+import { sendNotification } from "../services/notificationServices";
 
 const Chatsnippet = ({conversationId, userID, recipientAvatar, recipientName, lastMessage, lastMessageTime, UnreadMessageCount}) => {
     const socket = useSocket();
@@ -19,13 +20,17 @@ const Chatsnippet = ({conversationId, userID, recipientAvatar, recipientName, la
 
     // this function created a chat request and send a notification to the user
     const requestHandler = async() => {
-        sendRequest(userData.user_id, userID)
-        .then((req) => {
-            setRequestBtnState(true);
-            console.log(req);
-        })
-        .catch(() => setRequestBtnState(false));
-
+        if(userData) {
+            console.log("UserData", userData);
+            sendRequest(userData._id, userID)
+            .then(async(req) => {
+                setRequestBtnState(true);
+                await sendNotification(userID, "request", req._id);
+            })
+            .catch((error) => {
+                setRequestBtnState(false)
+            });
+        }
     }
 
     return(
@@ -46,7 +51,7 @@ const Chatsnippet = ({conversationId, userID, recipientAvatar, recipientName, la
             {/* Time and unread messages */}
             <div className="flex flex-col items-end justify-center">
                 {!conversationId &&
-                    <button onClick={requestHandler} className={`${requestBtnState ? "bg-transparent text-black border-2" : "bg-gray-800 text-white border-none"} xl:min-w-25 p-2 rounded-2xl text-[0.8rem]`}>{requestBtnState ? "Requested" : "Send Request"}</button>
+                    <button disabled={requestBtnState} onClick={requestHandler} className={`${requestBtnState ? "bg-transparent text-black border-2" : "bg-gray-800 text-white border-none"} xl:min-w-25 p-2 rounded-2xl text-[0.8rem]`}>{requestBtnState ? "Requested" : "Send Request"}</button>
                 }
 
                 {

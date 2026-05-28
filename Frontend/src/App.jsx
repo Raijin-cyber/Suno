@@ -51,6 +51,7 @@ function App() {
   useEffect(() => {
     getCurrentUser()
       .then((res) => {
+        console.log(res);
         dispatch(login({ userData: res.data.userData }));
         socket.connect();
       })

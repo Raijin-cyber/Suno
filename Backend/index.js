@@ -4,6 +4,7 @@ import http from "http";
 import cors from "cors";
 import configSocket from "./src/socket/index.js";
 import cookieParser from "cookie-parser";
+import errorHandler from "./src/middlewares/errorHandler.js";
 import { configDotenv } from "dotenv";
 import { Server } from "socket.io";
 import connectDB from "./database/dbConnection.js";
@@ -13,6 +14,7 @@ import authRoutes from "./src/routes/authRoutes.js";
 import convoRoutes from "./src/routes/convoRoutes.js";
 import messageRoutes from "./src/routes/messageRoutes.js";
 import requestRoutes from "./src/routes/requestRoutes.js";
+import notificationRoutes from "./src/routes/notificationRoutes.js";
 
 configDotenv(); // loads .env's content in process.env
 
@@ -40,6 +42,8 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/convo", convoRoutes);
 app.use("/api/v1/message", messageRoutes);
 app.use("/api/v1/request", requestRoutes);
+app.use("/api/v1/notification", notificationRoutes);
+app.use(errorHandler);
 
 // start the http server only if the database is ready to connect
 connectDB()

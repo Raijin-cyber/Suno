@@ -30,8 +30,9 @@ const Auth = () => {
         registerUser(username, email, password)
         .then(() => {
             loginUser(email, password)
-            .then(() => {
+            .then((res) => {
                 if(!socket.connected) socket.connect();
+                dispatch(login({userData: res.data.userData}));
                 setIsLoading(false);
                 navigate("/home");
             })
