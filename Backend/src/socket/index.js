@@ -1,27 +1,41 @@
 import formatTime from "../utilities/formatTime.js";
+import validateToken from "./middlewares/validateToken.js";
 
 const configSocket = (io) => {
     io.on("connection", (socket) => {
         console.log("New Socket:", socket.id);
         
-        socket.on("join_room", (room) => {
-            socket.join(room);
-            console.log(`Socket: ${socket.id} joined room: ${room} successfully!`);
+        // custom middlewares
+        validateToken(socket);
+
+        socket.on("conversation:join", ({ conversationId }) => {
+            socket.join(conversationId);
+            console.log(`Socket: ${socket.id} joined room: ${conversationId} successfully!`);
         });
 
-        socket.on("leave_room", (room) => {
-            socket.leave(room);
-            console.log(`Socket: ${socket.id} left room: ${room} successfully!`);
+        socket.on("conversation:joinMany", ({ roomIds }) => {
+            if(Array.isArray(roomIds)){ 
+                    roomIds.forEach((room) => {
+                    socket.join(room);
+                    console.log(`Socket: ${socket.id} joined room: ${room} successfully!`);
+                })
+            }
         })
 
-        socket.on("send_message", (message, convoId) => {
+        socket.on("conversation:leave", ({ conversationId }) => {
+            socket.leave(conversationId);
+            console.log(`Socket: ${socket.id} left room: ${conversationId} successfully!`);
+        })
+
+        socket.on("message:send", ({ senderId, conversationId, message }) => {
             const payload = {
-                text: message,
+                message: message,
                 senderId: socket.id, 
-                time: formatTime(new Date().toISOString())
+                conversationId: conversationId,
+                time: formatTime(new Date().toISOString()),
             };
 
-            io.to(convoId).emit("receive_message", payload);
+            io.to(conversationId).emit("message:receive", payload);
         });
 
 

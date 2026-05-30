@@ -90,28 +90,50 @@ const loginUser = asyncHandler(async(req, res, next) => {
                 expiresIn: "7d"
             }
         )
+        const wsToken = jwt.sign(
+            {
+                user: {
+                    _id: user._id,
+                    username: user.username,
+                },
+            },
+        
+            process.env.WS_TOKEN_SECRET,
+        
+            {
+                expiresIn: "15m"
+            }
+        )
         res.status(200);
         res.cookie("refreshToken", refreshToken,
             {
                 httpOnly: true,
-                secure: false,
-                sameSite: "lax",
+                secure: true,
+                sameSite: "strict",
                 maxAge: 7 * 24 * 60 * 60 * 1000
             }
         )
         res.cookie("accessToken", accessToken,
             {
                 httpOnly: true,
-                secure: false,
-                sameSite: "lax",
+                secure: true,
+                sameSite: "strict",
+                maxAge: 15 * 60 * 1000
+            }
+        )
+        res.cookie("wsToken", wsToken,
+            {
+                httpOnly: true,
+                secure: true,
+                sameSite: "strict",
                 maxAge: 15 * 60 * 1000
             }
         )
         res.cookie("userA_ID", user._id,
             {
                 httpOnly: true,
-                secure: false,
-                sameSite: "lax",
+                secure: true,
+                sameSite: "strict",
                 maxAge: 365 * 24 * 60 * 60 * 1000
             }
         )
@@ -176,12 +198,21 @@ const refreshToken = asyncHandler(async(req, res, next) => {
 
                 const user = decoded.user;
                 const newAccessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+                const newWsToken = jwt.sign({ user }, process.env.WS_TOKEN_SECRET, { expiresIn: "15m" });
                 res.status(200);
                 res.cookie("accessToken", newAccessToken,
                     {
                         httpOnly: true,
-                        secure: false,
-                        sameSite: "lax",
+                        secure: true,
+                        sameSite: "strict",
+                        maxAge: 15 * 60 * 1000
+                    }
+                )
+                res.cookie("wsToken", newWsToken,
+                    {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: "strict",
                         maxAge: 15 * 60 * 1000
                     }
                 )
@@ -205,22 +236,29 @@ const logoutUser = asyncHandler(async(req, res, next) => {
     res.clearCookie("refreshToken", 
         {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: true,
+            sameSite: "strict",
         }
     );
     res.clearCookie("accessToken", 
         {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: true,
+            sameSite: "strict",
+        }
+    );
+    res.clearCookie("wsToken", 
+        {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
         }
     );
     res.clearCookie("userA_ID", 
         {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: true,
+            sameSite: "strict",
         }
     );
     res.status(200)

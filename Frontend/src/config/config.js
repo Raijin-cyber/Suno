@@ -19,10 +19,10 @@ export const CONVO_API = {
 }
 
 export const MESSAGE_API = {
-    create: API_BASE_URL + "message/:id/create",
-    get: API_BASE_URL + "message/:id/get",
-    update: API_BASE_URL + "message/:id/update/:msgId",
-    delete: API_BASE_URL + "message/:id/delete/:msgId",
+    create: API_BASE_URL + "message", // message/:id/create
+    get: API_BASE_URL + "message", // message/:id/get
+    update: API_BASE_URL + "message", //message/:id/update/:msgId
+    delete: API_BASE_URL + "message", //message/:id/delete/:msgId
 }
 
 export const REQUEST_API = {

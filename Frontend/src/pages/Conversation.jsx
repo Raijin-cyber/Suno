@@ -1,11 +1,13 @@
 import Chat from "../components/Chat";
-import { sendMessage, receiveMessage, roomJoinEvent } from "../socket/chat";
+import { useDispatch } from "react-redux"; 
+import { sendMessage, joinRoom, leaveRoom, listenForMessages } from "../socket/chat";
 import { useSocket } from "../hooks/useSocket";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Conversation = () => {
     const socket = useSocket();
+    const dispatch = useDispatch();
     const bottomRef = useRef();
     const conversationPane = useRef();
     const { id } = useParams();
@@ -14,11 +16,10 @@ const Conversation = () => {
     const [chats, setChats] = useState([]);
     const [closing, setClosing] = useState(false);
 
-
     useEffect(() => {
-        receiveMessage(socket, setChats);
-        roomJoinEvent(socket, roomId);
-    }, []);
+      joinRoom(socket, { conversationId: roomId });
+      listenForMessages(socket, dispatch, setChats);
+    }, [roomId]);
 
     useEffect(() => {
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -28,7 +29,7 @@ const Conversation = () => {
     const sendMessageHandler = (e) => {
         e.preventDefault();
         if(e.target[0].value !== '') {
-          sendMessage(socket, e.target[0].value, roomId);
+          sendMessage(socket, { conversationId: roomId, message: e.target[0].value });
           e.target[0].value = "";
         }
     }

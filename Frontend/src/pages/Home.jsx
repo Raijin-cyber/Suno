@@ -5,13 +5,16 @@ import { useDispatch } from "react-redux";
 import { useSocket } from "../hooks/useSocket";
 import { useScreenWidth } from "../hooks/useScreenWidth";
 import { getCurrentUser, logoutUser, searchUser } from "../services/authServices";
-import { receiveNotification, readNotification } from "../services/notificationServices"
+import { receiveNotification, readNotification } from "../services/notificationServices";
 import { getAllUserConversation } from "../services/conversationServices";
 import { login, logout } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
 import Chatsnippet from "../components/Chatsnippet";
 import NotificationSnippet from "../components/NotificationSnippet";
 import Silk from "../React-Bites Components/Silk";
+
+// socket related imports
+import { joinRooms } from "../socket/chat";
 
 
 const Home = () => {
@@ -58,13 +61,16 @@ const Home = () => {
     // Conversation list, it is for opening the previuos conversation
     const [conversations, setConversations] = useState([]);
 
+    // Flag for rooms if they are joined or not
+    const [isJoined, setIsJoined] = useState(false);
+
     // Notification list of a user
     const [notifications, setNotifications] = useState([]);
 
     const isConversationOpen = !!id
     const showPlaceholder = !isConversationOpen && screenWidth >= 768;
 
-    //fetch all user's conversations
+    // fetch all user's conversations
     useEffect(() => {
         (async() => {
             await getAllUserConversation()
@@ -74,6 +80,15 @@ const Home = () => {
             .catch((err) => setConversations([]))
         })()
     }, [notifications])
+
+    // connect user to all existing conversations(room with conversation ID)
+    useEffect(() => {
+        if(!isJoined && conversations.length > 0) {
+            joinRooms(socket, {roomIds: conversations.map(c => c.convoId)});
+            setIsJoined(true);
+        }
+    }, [conversations, isJoined]);
+
 
     // fetch all user's notifications
     useEffect(() => {
@@ -125,10 +140,7 @@ const Home = () => {
         });
     };
 
-
-    const recipientName = ["JOJO", "JOJO", "JOJO", "JOJO", "JOJO", "JOJO", "JOJO", "JOJO", "JOJO", "JOJO", "JOJO", "JOJO", "JOJO", "JOJO"];
-
-    return (
+        return (
         <div className="h-screen flex relative">
             {/* Conversations pane */}
             <div id="left pane" className="relative h-screen flex flex-col gap-y-5 px-4 py-3 w-full md:w-[40%] lg:w-[30%]">

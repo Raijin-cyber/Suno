@@ -121,12 +121,20 @@ const updateMessage = asyncHandler(async(req, res, next) => {
 //@access private
 const deleteMessage = asyncHandler(async(req, res, next) => {
     const msgId = req.params.msgId;
+    const senderId = req.cookies.userA_ID;
 
     const message = await Message.findById(msgId);
     
+    // check if there is a message with the provided ID
     if (!message) {
         res.status(404);
         throw new Error("Message not found with the provided ID.");
+    }
+
+    // check if the message was send by the user(only the sender can delete his/her message)
+    if(message.senderId.toString() !== senderId) {
+        res.status(403);
+        throw new Error("Forbidden: You cannot delete a message you did not create.");
     }
 
     // soft delete

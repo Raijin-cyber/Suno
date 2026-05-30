@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useSocket } from "../hooks/useSocket";
-import { roomJoinEvent } from "../socket/chat";
 import { useNavigate } from "react-router-dom";
 import { sendRequest } from "../services/requestServices";
 import { sendNotification } from "../services/notificationServices";

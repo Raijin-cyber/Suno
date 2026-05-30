@@ -1,41 +1,53 @@
-// *** METHODS  
+import { updateLastMessage, incrementUnread } from "../store/conversationsSlice";
+import { SOCKET_EVENTS } from "./socketEvents";
 
-// join conversation(room) 
-// leave conversation(room)
-// send message
-// receive message
+// *** SOCKET METHODS ***
 
-// ***NOTE: we are going to pass hook (socket) ref to all of these functions
+// Join a single conversation room
+const joinRoom = (socket, { conversationId }) => {
+  socket.emit(SOCKET_EVENTS.CONVERSATION_JOIN, { conversationId });
+};
 
-// in this we are going to join a room, now a room can be of two people or more than 2 people
-const roomJoinEvent = (socket, convoId) => {
-    socket.emit("join_room", convoId);
-}
+// Join multiple conversation rooms at once
+const joinRooms = (socket, { roomIds }) => {
+  socket.emit(SOCKET_EVENTS.CONVERSATION_JOIN_MANY, { roomIds });
+};
 
-const roomLeaveEvent = (socket, convoId) => {
-    socket.emit("leave_room", convoId);
-}
+// Leave a conversation room
+const leaveRoom = (socket, { conversationId }) => {
+  socket.emit(SOCKET_EVENTS.CONVERSATION_LEAVE, { conversationId });
+};
 
-const sendMessage = (socket, message, convoId) => {
-    socket.emit("send_message", message, convoId);
-}
+// Send a message to a conversation room
+const sendMessage = (socket, { conversationId, message }) => {
+  const senderId = socket.id;
+  socket.emit(SOCKET_EVENTS.MESSAGE_SEND, { senderId, conversationId, message });
+};
 
-const receiveMessage = (socket, setChats) => {
-    socket.on("receive_message", (payload) => {
-        setChats((prev) => [
-            ...prev,
-            {
-                message: payload.text,
-                isOwn: payload.senderId === socket.id, // check if I sent it
-                time: payload.time
-            }
-        ]);
-    });
-}
+// Listen for incoming messages
+const listenForMessages = (socket, dispatch, setChats) => {
+  socket.on(SOCKET_EVENTS.MESSAGE_RECEIVE, ({ senderId, conversationId, message, time }) => {
+    setChats((prev) => [
+      ...prev,
+      {
+        message: message,
+        isOwn: senderId === socket.id, // check if I sent it
+        conversationId,
+        time: time,
+      },
+    ]); 
+
+    dispatch(updateLastMessage({ conversationId, message }));
+    dispatch(incrementUnread({ conversationId }));
+  });
+
+  return () => socket.off(SOCKET_EVENTS.MESSAGE_RECEIVE);
+};
 
 export {
-    roomJoinEvent,
-    roomLeaveEvent,
-    sendMessage,
-    receiveMessage
-}
+  joinRoom,
+  joinRooms,
+  leaveRoom,
+  sendMessage,
+  listenForMessages,
+};
