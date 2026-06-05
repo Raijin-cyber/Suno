@@ -16,8 +16,12 @@ export const SOCKET_EVENTS = {
   // Presence
   PRESENCE_ONLINE: "presence:online",
   PRESENCE_OFFLINE: "presence:offline",
+  PRESENCE_PING: "presence:ping",
 
   // Typing
   TYPING_START: "typing:start",
   TYPING_STOP: "typing:stop",
+  
+  // Error
+  ERROR: "error:event",
 };

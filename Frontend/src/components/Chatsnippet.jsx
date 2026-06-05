@@ -33,7 +33,7 @@ const Chatsnippet = ({conversationId, userID, recipientAvatar, recipientName, la
     }
 
     return(
-        <div onClick={roomHandler} className={`backdrop-blur-[1.5px] backdrop-saturate-200% bg-[rgba(255,255,255,0.3)] border border-[rgba(255,255,255,0.1)] flex items-center justify-between w-full p-2 rounded-2xl transition duration-100 ${conversationId && "hover:bg-black/20 active:bg-black/20"}`}>
+        <div onClick={roomHandler} className={`backdrop-blur-[1.5px] bg-[rgba(255,255,255,0.3)] border border-[rgba(255,255,255,0.1)] flex items-center justify-between w-full p-2 rounded-2xl transition duration-100 ${conversationId && "hover:bg-black/20 active:bg-black/20"}`}>
             <div className="flex items-center gap-3">
                 {/* Avatar */}
                 <div className="w-12 h-auto">

@@ -1,51 +1,48 @@
-import formatTime from "../utilities/formatTime.js";
 import validateToken from "./middlewares/validateToken.js";
+import { emitMessageEvent } from "./chat.js";
+import { ListenerForJoinManyRoomsEvent, ListenerForJoinRoomEvent, ListenerForLeavingRoom } from "./room.js";
+import { listenForTypingEvent, listenForNotTypingEvent } from "./typing.js";
+import { listenForOfflineUsersEvent, listenForOnlineUsersEvent, listenForPresencePingEvent } from "./presence.js";
+import { listenForMarkAsReadEvent } from "./conversation.js";
 
 const configSocket = (io) => {
     io.on("connection", (socket) => {
+        // console if a socket is connected
         console.log("New Socket:", socket.id);
+
+        // connection related events
+        (() => {
+            socket.on("disconnect", (reason) => {
+                console.log(`Client ${socket.id} disconnected: ${reason}`);
+            })
+            
+            socket.on("reconnect_attempt", (attempt) => {
+                console.log("Reconnection attempt:", attempt);
+            });
+        })()
         
         // custom middlewares
         validateToken(socket);
 
-        socket.on("conversation:join", ({ conversationId }) => {
-            socket.join(conversationId);
-            console.log(`Socket: ${socket.id} joined room: ${conversationId} successfully!`);
-        });
+        // room joining related events
+        ListenerForJoinManyRoomsEvent(socket);
+        ListenerForJoinRoomEvent(socket);
+        ListenerForLeavingRoom(socket);
 
-        socket.on("conversation:joinMany", ({ roomIds }) => {
-            if(Array.isArray(roomIds)){ 
-                    roomIds.forEach((room) => {
-                    socket.join(room);
-                    console.log(`Socket: ${socket.id} joined room: ${room} successfully!`);
-                })
-            }
-        })
+        // typing related events
+        listenForTypingEvent(io, socket);
+        listenForNotTypingEvent(io, socket);
 
-        socket.on("conversation:leave", ({ conversationId }) => {
-            socket.leave(conversationId);
-            console.log(`Socket: ${socket.id} left room: ${conversationId} successfully!`);
-        })
+        // presence related events
+        listenForOnlineUsersEvent(io, socket);
+        listenForOfflineUsersEvent(io, socket);
+        listenForPresencePingEvent(io, socket);
 
-        socket.on("message:send", ({ senderId, conversationId, message }) => {
-            const payload = {
-                message: message,
-                senderId: socket.id, 
-                conversationId: conversationId,
-                time: formatTime(new Date().toISOString()),
-            };
+        // message related events
+        emitMessageEvent(io, socket);
 
-            io.to(conversationId).emit("message:receive", payload);
-        });
-
-
-        socket.on("disconnect", (reason) => {
-            console.log(`Client ${socket.id} disconnected: ${reason}`);
-        })
-        
-        socket.on("reconnect_attempt", (attempt) => {
-            console.log("Reconnection attempt:", attempt);
-        });
+        // read receipt related events
+        listenForMarkAsReadEvent(io, socket);
     })
 }
 

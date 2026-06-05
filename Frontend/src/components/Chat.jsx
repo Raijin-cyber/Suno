@@ -1,4 +1,9 @@
-const Chat = ({ msg, creator, isOwn, time }) => {
+import { useState } from "react";
+
+const Chat = ({ msgId, msg, referenceMsg, creator, referenceMsgCreator, isOwn, time, referenceMsgSetter, referenceMsgCreatorSetter, convoType }) => {
+
+  const [showChatControls, setShowChatControls] = useState(false);
+
   const baseClasses =
     "flex flex-col justify-between max-w-[90%] lg:max-w-2xl min-w-[5.25rem] px-3 py-2";
 
@@ -8,20 +13,44 @@ const Chat = ({ msg, creator, isOwn, time }) => {
   const otherClasses =
     "animate-fade-in-right animate-duration-[100ms] rounded-bl-2xl rounded-r-2xl bg-[#fc94af] shadow-[3px_3px_2px_#b56b7e,-2px_-2px_2px_#ffbde0]";
 
+  const referenceMsgSetterHandler = (e) => {
+    const chatBubble = document.getElementById(`chat_bubble${msgId}`);
+    referenceMsgSetter(chatBubble.innerText);
+    referenceMsgCreatorSetter(creator);
+  }
+
   return (
-    <div className={` flex ${isOwn ? "justify-end" : "justify-start"} mb-2`}>
+    <div onMouseEnter={() => setShowChatControls(true)} onMouseLeave={() => setShowChatControls(false)} className={` flex ${isOwn ? "justify-start flex-row-reverse" : "justify-start"} mb-2 gap-x-8 items-center`}>
+      {/* Chat */}
       <div className={`${baseClasses} ${isOwn ? ownClasses : otherClasses} break-all overflow-hidden`}>
         {/* Sender name */}
-        {creator && (
+        {(creator && convoType === "group") && (
           <p className="text-xs font-semibold text-gray-600 mb-1 items-start">{creator}</p>
         )}
 
+        {/* reference message */}
+        {referenceMsg && 
+          <div className={`${isOwn ? "rounded-tl-xl" : "rounded-tr-xl"} flex flex-col justify-start backdrop-blur-[18px] backdrop-saturate-67 bg-black/5 border border-black/5 px-1 mt-1 py-0.5 text-[0.9rem] text-black/60`}>
+            <p className="font-medium">{`>${referenceMsgCreator === creator && isOwn ? "YOU" : referenceMsgCreator}`}</p>
+            <p className="">{referenceMsg}</p>
+          </div>
+        }
+
         {/* Message */}
-        <p className={`text-[1.10rem] text-gray-800 ${isOwn ? "self-end" : "self-start"}`}>{msg}</p>
+        <p id={`chat_bubble${msgId}`} className={`text-[1.10rem] text-gray-800 ${isOwn ? "self-end" : "self-start"}`}>{msg}</p>
 
         {/* Timestamp */}
         <span className={`text-xs tracking-tight font-light ${isOwn ? "self-end" : "self-start"}`}>{time}</span>
       </div>
+      
+      {/* Chat controls */}
+      {showChatControls &&
+        <div className={`flex items-center gap-x-2 ${!isOwn && "flex-row-reverse"}`}>
+          <button onClick={referenceMsgSetterHandler} className="hover:bg-black/20 rounded-full p-1 transition duration-200 active:bg-black/30"><img className="max-w-5 min-w-5" src="/assets/icons/reply.png" alt="reply" /></button>
+          <button className="hover:bg-black/20 rounded-full p-1 transition duration-200 active:bg-black/30"><img className="max-w-5 min-w-5" src="/assets/icons/add_emoji.png" alt="reaction" /></button>
+          <button className="hover:bg-black/20 rounded-full p-1 transition duration-200 active:bg-black/30"><img className="max-w-5 min-w-5" src="/assets/icons/dots_black.png" alt="controls" /></button>
+        </div>
+      }
     </div>
   );
 };

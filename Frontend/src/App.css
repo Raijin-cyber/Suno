@@ -33,7 +33,6 @@ input:-webkit-autofill:focus {
     background-size: 230% 230%; animation: animated-gradient-flow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-
 @keyframes animated-gradient-flow {
     0% {
         background-position: 0% 50%;

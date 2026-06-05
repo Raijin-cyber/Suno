@@ -10,11 +10,16 @@ import { getAllUserConversation } from "../services/conversationServices";
 import { login, logout } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
 import Chatsnippet from "../components/Chatsnippet";
+import Notification from "../components/Notification";
 import NotificationSnippet from "../components/NotificationSnippet";
+import listenForErrorforWs from "../socket/ErrorEvent";
 import Silk from "../React-Bites Components/Silk";
 
 // socket related imports
 import { joinRooms } from "../socket/chat";
+import { listenForOnlineUsersEvent, listenForOfflineUsersEvent, emitOnlineEvent, emitOfflineEvent, emitPresencePingEvent } from "../socket/presence";
+import { listenForTypingEvent, listenForNotTypingEvent } from "../socket/typing";
+import { listenForMarkAsReadEvent } from "../socket/conversation";
 
 
 const Home = () => {
@@ -67,8 +72,38 @@ const Home = () => {
     // Notification list of a user
     const [notifications, setNotifications] = useState([]);
 
+    // Error variable for storing error state
+    const [error, setError] = useState('');
+
     const isConversationOpen = !!id
     const showPlaceholder = !isConversationOpen && screenWidth >= 768;
+
+    // mounting neccessary listener for ws connection
+    useEffect(() => {
+        listenForOnlineUsersEvent(socket, dispatch);
+        listenForOfflineUsersEvent(socket, dispatch);
+        listenForTypingEvent(socket, dispatch);
+        listenForNotTypingEvent(socket, dispatch);
+        listenForMarkAsReadEvent(socket, dispatch);
+
+        () => {
+            emitOfflineEvent(socket, { userId: userData._id, conversationIds: conversations.map(c => c.convoId) });
+        }
+    }, [])
+
+    // mounting error event listener for ws connection
+    useEffect(() => {
+        listenForErrorforWs(socket, setError);
+    }, [error])
+
+    // heartbeat function for pinging the server to keep presence alive
+    useEffect(() => {
+        const interval = setInterval(() => {
+            emitPresencePingEvent(socket, { userId: userData._id, conversationIds: conversations.map(c => c.convoId) });
+        }, 30000); // every 30 seconds
+
+        return () => clearInterval(interval);
+    }, [conversations]);
 
     // fetch all user's conversations
     useEffect(() => {
@@ -76,6 +111,7 @@ const Home = () => {
             await getAllUserConversation()
             .then((convo) => {
                 setConversations(convo);
+                if(conversations) emitOnlineEvent(socket, { userId: userData._id, conversationIds: conversations.map(c => c.convoId) });
             })
             .catch((err) => setConversations([]))
         })()
@@ -88,7 +124,6 @@ const Home = () => {
             setIsJoined(true);
         }
     }, [conversations, isJoined]);
-
 
     // fetch all user's notifications
     useEffect(() => {
@@ -127,6 +162,7 @@ const Home = () => {
     const logoutHandler = () => {
         logoutUser()
         .then(() => {
+            emitOfflineEvent(socket, { userId: userData._id, conversationIds: conversations.map(c => c.convoId) });     // emit offline event when user logs out
             dispatch(logout());       // clear Redux slice first
             socket.disconnect();      // then disconnect socket
             navigate("/");            // finally navigate
@@ -140,11 +176,14 @@ const Home = () => {
         });
     };
 
-        return (
+    return (
         <div className="h-screen flex relative">
             {/* Conversations pane */}
             <div id="left pane" className="relative h-screen flex flex-col gap-y-5 px-4 py-3 w-full md:w-[40%] lg:w-[30%]">
-            
+                
+                {/* Notification */}
+                <Notification errorMessage={error} />
+
                 <div className="min-w-full relative flex flex-col items-center mask-[radial-gradient(circle,white_95%,transparent_100%)] mask-no-repeat mask-center mask-cover rounded-3xl">
                     {/* React-Bite Component */}
                     <Silk
@@ -246,7 +285,7 @@ const Home = () => {
                 </div>
 
                 {/* notification pane */}
-                <div id="notification pane" className={`${isNotifiOpen ? "translate-x-0" : "-translate-x-full"} absolute left-0 top-0 p-3 flex flex-col gap-y-5 ease-in-out max-md:bottom-0 overflow-hidden md:left-0 md:top-0 transition-all duration-500 bg-[#fc94Af] h-full w-full max-w-screen`}>
+                <div id="notification pane" className={`${isNotifiOpen ? "translate-x-0" : "-translate-x-full"} z-2 absolute left-0 top-0 p-3 flex flex-col gap-y-5 ease-in-out max-md:bottom-0 overflow-hidden md:left-0 md:top-0 transition-all duration-500 bg-[#fc94Af] h-full w-full max-w-screen`}>
                     <div className="flex items-center justify-center">
                         <p className="font-sans text-center text-2xl font-medium w-full">Notification</p>
                         <button onClick={() => setIsNotifiOpen(prev => false)} className="absolute right-3 top-3 w-9"><img src="/assets/icons/cross_black.png" alt="cross" /></button>
@@ -295,7 +334,7 @@ const Home = () => {
                     {/* Chats */}
                     <div className="h-full w-full p-5 flex flex-col overflow-y-auto overflow-x-hidden scrollbar-hide">
                         {/* this for the chat sub page with the existing conversations */}
-                        {id && <Outlet />}
+                        {id && <Outlet context={conversations.find((convo) => { if(id === convo.convoId) return convo })}/>}
                     </div>
                 
                 </div>

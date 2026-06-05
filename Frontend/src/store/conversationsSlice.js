@@ -22,8 +22,8 @@ const conversationsSlice = createSlice({
   initialState,
   reducers: {
     updatePresence: (state, action) => {
-      const { userId, status } = action.payload;
-      state.presence[userId] = status;
+      const { conversationId, members } = action.payload;
+      state.presence[conversationId] = members;
     },
     updateTyping: (state, action) => {
       const { conversationId, userId } = action.payload;

@@ -8,6 +8,7 @@ import errorHandler from "./src/middlewares/errorHandler.js";
 import { configDotenv } from "dotenv";
 import { Server } from "socket.io";
 import connectDB from "./database/dbConnection.js";
+import Redis from "ioredis";
 
 // routes
 import authRoutes from "./src/routes/authRoutes.js";
@@ -50,3 +51,20 @@ connectDB()
 .then(() => {
     httpServer.listen(PORT, () => console.log(`Server is listening on http://localhost:${PORT}/api/v1`));
 });
+
+// connect caching server (in this case, caching server is Valkey)
+export const redis = new Redis(
+    {
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
+        username: process.env.REDIS_USER,
+        password: process.env.REDIS_PASSWORD,
+        tls: {}
+    }
+);
+
+redis.on("connecting", () => console.log("Trying to connect to caching server..."));
+redis.on("connect", () => console.log("Caching server connected"));
+redis.on("reconnecting", () => console.log("Caching server reconnected"));
+redis.on("error", (error) => console.log("Redis Error: ", error));
+redis.on("end", () => console.log("Redis connection closed"));

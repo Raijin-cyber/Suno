@@ -22,10 +22,10 @@ export const WSErrorMessages = {
   [WSErrorCodes.INTERNAL_ERROR]: "Unexpected server error occurred",
 };
 
-const createWsErrorObject = (code) => {
+const createWsErrorObject = (code, errorMessage) => {
   return {
     code,
-    message: wsErrorMessages[code] || "Unknown WebSocket error",
+    message: errorMessage || WSErrorMessages[code] || "Unknown WebSocket error",
     timestamp: new Date().toISOString(),
     type: "WebSocketError",
   };

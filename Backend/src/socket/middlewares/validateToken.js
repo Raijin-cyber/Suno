@@ -14,7 +14,8 @@ const validateToken = (socket) => {
         SOCKET_EVENTS.ERROR,
         createWsErrorObject(401, "Missing WebSocket token")
       );
-      return socket.disconnect(true);
+      socket.disconnect(true);
+      return;
     }
 
     try {
@@ -31,7 +32,7 @@ const validateToken = (socket) => {
         SOCKET_EVENTS.ERROR,
         createWsErrorObject(401, "Invalid or expired WebSocket token")
       );
-      return socket.disconnect(true);
+      return;
     }
   });
 };

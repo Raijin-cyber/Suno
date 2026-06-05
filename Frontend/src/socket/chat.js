@@ -19,18 +19,21 @@ const leaveRoom = (socket, { conversationId }) => {
 };
 
 // Send a message to a conversation room
-const sendMessage = (socket, { conversationId, message }) => {
+const sendMessage = (socket, { conversationId, message, messageCreator, referenceMessage, referenceMessageCreator }) => {
   const senderId = socket.id;
-  socket.emit(SOCKET_EVENTS.MESSAGE_SEND, { senderId, conversationId, message });
+  socket.emit(SOCKET_EVENTS.MESSAGE_SEND, { senderId, conversationId, message, messageCreator, referenceMessage, referenceMessageCreator });
 };
 
 // Listen for incoming messages
 const listenForMessages = (socket, dispatch, setChats) => {
-  socket.on(SOCKET_EVENTS.MESSAGE_RECEIVE, ({ senderId, conversationId, message, time }) => {
+  socket.on(SOCKET_EVENTS.MESSAGE_RECEIVE, ({ senderId, conversationId, message, messageCreator, referenceMessage, referenceMessageCreator, time }) => {
     setChats((prev) => [
       ...prev,
       {
         message: message,
+        messageCreator: messageCreator,
+        referenceMessage: referenceMessage,
+        referenceMessageCreator: referenceMessageCreator,
         isOwn: senderId === socket.id, // check if I sent it
         conversationId,
         time: time,
