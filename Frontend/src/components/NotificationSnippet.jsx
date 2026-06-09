@@ -13,7 +13,7 @@ const NotificationSnippet = ({notificationContent, requestNotification}) => {
     }
 
     const deleteRequestHandler = () => {
-
+        
     }
 
     return (
@@ -29,8 +29,8 @@ const NotificationSnippet = ({notificationContent, requestNotification}) => {
                         <p className="grow w-[50%] md:w-[60%] text-[0.9rem]">{`${notificationContent.sender.username} wants to connect with you.`}</p>
                     </div>
 
-                    <div className="flex items-center justify-end gap-x-3 w-[35%]">
-                        <button disabled={requestStatus} onClick={acceptRequestHandler} className={`px-2 text-sm text-center text-[#e5e5e5] border py-1 backdrop-blur-md backdrop-saturate-134 bg-[rgba(17,25,40,0.51)] ${!requestStatus && "active:bg-[rgba(76,77,79,0.51)]"} rounded-lg transition duration-75 border-[rgba(255,255,255,0.125)]`}>{requestStatus ? "Confirmed" :"Confirm"}</button>
+                    <div className="flex items-center justify-end gap-x-1 w-[35%]">
+                        <button disabled={requestStatus} onClick={acceptRequestHandler} className={`px-2 text-sm text-center text-[#e5e5e5] border py-1 backdrop-blur-md backdrop-saturate-134 bg-[rgba(0,0,0,0.8)] ${!requestStatus && "active:bg-[rgba(76,77,79,0.8)]"} rounded-lg transition duration-75 border-[rgba(255,255,255,0.125)]`}>{requestStatus ? "Confirmed" :"Confirm"}</button>
                         {!requestStatus && <button onClick={deleteRequestHandler} className="min-w-6 max-w-6 active:bg-black/20 rounded-full transition duration-75"><img src="/assets/icons/cross_black.png" alt="black cross" /></button>}
                     </div>
                 

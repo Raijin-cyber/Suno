@@ -1,4 +1,5 @@
-import { updateLastMessage, incrementUnread } from "../store/conversationsSlice";
+import { updateLastMessage, incrementUnread, updateUnreadMessages } from "../store/conversationsSlice";
+import { updateMessage } from "../store/messagesSlice";
 import { SOCKET_EVENTS } from "./socketEvents";
 
 // *** SOCKET METHODS ***
@@ -21,26 +22,40 @@ const leaveRoom = (socket, { conversationId }) => {
 // Send a message to a conversation room
 const sendMessage = (socket, { conversationId, message, messageCreator, referenceMessage, referenceMessageCreator }) => {
   const senderId = socket.id;
-  socket.emit(SOCKET_EVENTS.MESSAGE_SEND, { senderId, conversationId, message, messageCreator, referenceMessage, referenceMessageCreator });
+  const messageId = Date.now();
+  socket.emit(SOCKET_EVENTS.MESSAGE_SEND, { senderId, conversationId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator });
 };
 
 // Listen for incoming messages
-const listenForMessages = (socket, dispatch, setChats) => {
-  socket.on(SOCKET_EVENTS.MESSAGE_RECEIVE, ({ senderId, conversationId, message, messageCreator, referenceMessage, referenceMessageCreator, time }) => {
-    setChats((prev) => [
-      ...prev,
-      {
-        message: message,
-        messageCreator: messageCreator,
-        referenceMessage: referenceMessage,
-        referenceMessageCreator: referenceMessageCreator,
-        isOwn: senderId === socket.id, // check if I sent it
-        conversationId,
-        time: time,
-      },
-    ]); 
+const listenForMessages = (socket, dispatch) => {
+  socket.on(SOCKET_EVENTS.MESSAGE_RECEIVE, ({ senderId, conversationId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator, time }) => { 
+    // update messages slice -> store messages in the store
+    dispatch(updateMessage({
+      convoId: conversationId, 
+      messageId: messageId,
+      message: message, 
+      messageCreator: messageCreator, 
+      referenceMessage: referenceMessage, 
+      referenceMessageCreator: referenceMessageCreator,
+      isOwn: senderId === socket.id, 
+      time: time,
+    }));
 
-    dispatch(updateLastMessage({ conversationId, message }));
+    // only other user's message
+    if(senderId !== socket.id) {
+      dispatch(updateUnreadMessages({
+        conversationId: conversationId, 
+        messageId: messageId,
+        message: message, 
+        messageCreator: messageCreator, 
+        referenceMessage: referenceMessage, 
+        referenceMessageCreator: referenceMessageCreator,
+        isOwn: senderId === socket.id, 
+        time: time,
+      }));
+    }
+    
+      dispatch(updateLastMessage({ conversationId, message, time }));
     dispatch(incrementUnread({ conversationId }));
   });
 

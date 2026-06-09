@@ -28,9 +28,12 @@ const messageSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    readAt: {
-        type: Date,
-    }
+    readByAt: [
+        {
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+            readAt: { type: Date, default: Date.now }
+        }
+    ]
 },
     {
         timestamps: true

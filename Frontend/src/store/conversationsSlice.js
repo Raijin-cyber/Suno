@@ -9,9 +9,10 @@ const ensureConvo = (state, conversationId) => {
   if (!state.byId[conversationId]) {
     state.byId[conversationId] = {
       lastMessage: null,
+      lastMessageTime: null,
       typingUsers: [],
       unreadCount: 0,
-      readReceipts: {}
+      unreadMessages: []
     };
   }
   return state.byId[conversationId];
@@ -38,9 +39,10 @@ const conversationsSlice = createSlice({
       }
     },
     updateLastMessage: (state, action) => {
-      const { conversationId, message } = action.payload;
+      const { conversationId, message, time } = action.payload;
       const convo = ensureConvo(state, conversationId);
       convo.lastMessage = message;
+      convo.lastMessageTime = time;
     },
     incrementUnread: (state, action) => {
       const { conversationId } = action.payload;
@@ -50,14 +52,17 @@ const conversationsSlice = createSlice({
     resetUnread: (state, action) => {
       const { conversationId } = action.payload;
       const convo = ensureConvo(state, conversationId);
-      convo.unreadCount = 0;
+      convo.unreadCount = null;
     },
-    updateReadReceipt: (state, action) => {
-      const { conversationId, messageId, readerId } = action.payload;
-      const convo = ensureConvo(state, conversationId);
-      convo.readReceipts[messageId] = [
-        ...new Set([...(convo.readReceipts[messageId] || []), readerId])
-      ];
+    updateUnreadMessages: (state, action) => {
+      const { conversationId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator, time  } = action.payload;
+
+      // now store unread message
+      state.byId[conversationId].unreadMessages.push({ conversationId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator, time });
+    },
+    clearUnreadMessages: (state, action) => {
+      const { conversationId } = action.payload;
+      state.byId[conversationId].unreadMessages = [];
     }
   }
 });
@@ -70,5 +75,6 @@ export const {
   updateLastMessage,
   incrementUnread,
   resetUnread,
-  updateReadReceipt
+  updateUnreadMessages,
+  clearUnreadMessages
 } = conversationsSlice.actions;

@@ -16,7 +16,7 @@ import listenForErrorforWs from "../socket/ErrorEvent";
 import Silk from "../React-Bites Components/Silk";
 
 // socket related imports
-import { joinRooms } from "../socket/chat";
+import { joinRooms, listenForMessages } from "../socket/chat";
 import { listenForOnlineUsersEvent, listenForOfflineUsersEvent, emitOnlineEvent, emitOfflineEvent, emitPresencePingEvent } from "../socket/presence";
 import { listenForTypingEvent, listenForNotTypingEvent } from "../socket/typing";
 import { listenForMarkAsReadEvent } from "../socket/conversation";
@@ -31,30 +31,16 @@ const Home = () => {
     const navigate = useNavigate();
     const screenWidth = useScreenWidth();
     const [addButtonState, setAddButtonState] = useState(false);
+
+    // playing area *********************
+    const chatSnippetData = useSelector((state) => {return state.conversations.byId}) || {};
+    // console.log(chatSnippetData);
     
     // Notification and alert logic
     const [ alert, setAlert ] = useState(true);
     const [isNotifiOpen, setIsNotifiOpen] = useState(false);
     const timerRef = useRef(null);
     const longPressTriggered = useRef(false);
-    const handleMouseDown = () => {
-        longPressTriggered.current = false;
-        timerRef.current = setTimeout(() => {
-            setAlert(prev => !prev);
-            longPressTriggered.current = true;
-        }, 1000);
-    }
-    const handleMouseUp = () => {
-        clearTimeout(timerRef.current);
-    }
-    const handleClick = async() => {
-        if(longPressTriggered.current) {
-            // logic
-            return;
-        }
-        setIsNotifiOpen(prev => true);
-        await readNotification();
-    }
 
     // This logic is for debounced search bar
     const [query, setQuery] = useState('');
@@ -80,14 +66,21 @@ const Home = () => {
 
     // mounting neccessary listener for ws connection
     useEffect(() => {
-        listenForOnlineUsersEvent(socket, dispatch);
-        listenForOfflineUsersEvent(socket, dispatch);
-        listenForTypingEvent(socket, dispatch);
-        listenForNotTypingEvent(socket, dispatch);
-        listenForMarkAsReadEvent(socket, dispatch);
-
-        () => {
+        const onlineUserListner =  listenForOnlineUsersEvent(socket, dispatch);
+        const offlineUserListner = listenForOfflineUsersEvent(socket, dispatch);
+        const typingUserListner = listenForTypingEvent(socket, dispatch);
+        const notTypingUserListner = listenForNotTypingEvent(socket, dispatch);
+        const markAsReadListner = listenForMarkAsReadEvent(socket, dispatch);
+        const messagesListener = listenForMessages(socket, dispatch);
+        
+        return () => {
             emitOfflineEvent(socket, { userId: userData._id, conversationIds: conversations.map(c => c.convoId) });
+            onlineUserListner(); 
+            offlineUserListner(); 
+            typingUserListner(); 
+            notTypingUserListner(); 
+            markAsReadListner();
+            messagesListener();
         }
     }, [])
 
@@ -158,6 +151,25 @@ const Home = () => {
             })()
         }
     }, [debouncedQuery]);
+
+    const handleMouseDown = () => {
+        longPressTriggered.current = false;
+        timerRef.current = setTimeout(() => {
+            setAlert(prev => !prev);
+            longPressTriggered.current = true;
+        }, 1000);
+    }
+    const handleMouseUp = () => {
+        clearTimeout(timerRef.current);
+    }
+    const handleClick = async() => {
+        if(longPressTriggered.current) {
+            // logic
+            return;
+        }
+        setIsNotifiOpen(prev => true);
+        await readNotification();
+    }
 
     const logoutHandler = () => {
         logoutUser()
@@ -233,6 +245,7 @@ const Home = () => {
                             return (
                                 <Chatsnippet
                                 key={convo.convoId}
+                                conversationData={chatSnippetData[convo.convoId]}
                                 conversationId={convo.convoId}
                                 recipientName={recipientName}
                                 />
@@ -293,7 +306,7 @@ const Home = () => {
                     
                     {/* notifications area */}
                     <div className="flex flex-col gap-y-2 h-full w-full py-5 px-4 rounded-3xl shadow-[inset_6px_6px_5px_#de829a,inset_-6px_-6px_5px_#ffa6c4]">
-                        {notifications.map((notifi) => {
+                        {notifications?.map((notifi) => {
                                 if(notifi.type === "request") return <NotificationSnippet key={notifi._id} notificationContent={notifi} requestNotification={true} />
                                 if(notifi.type === "message") return <NotificationSnippet key={notifi._id} notificationContent={notifi}  messageNotification={true} />
                                 if(notifi.type === "reminder") return <NotificationSnippet key={notifi._id} notificationContent={notifi} reminderNotification={true} />

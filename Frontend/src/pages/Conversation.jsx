@@ -1,5 +1,7 @@
 import Chat from "../components/Chat";
-import { useDispatch, useSelector } from "react-redux"; 
+import TypingIndicator from "../components/TypingIndicator";
+import { useDispatch, useSelector } from "react-redux";
+import { clearUnreadMessages, resetUnread } from "../store/conversationsSlice"; 
 import { updateMessage, setMessage } from "../store/messagesSlice";
 import { sendMessage, joinRoom, leaveRoom, listenForMessages } from "../socket/chat";
 import { useSocket } from "../hooks/useSocket";
@@ -8,12 +10,18 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 
 // socket related imports
 import { emitOnlineEvent } from "../socket/presence";
+import { emitTypingEvent, emitNotTypingEvent } from "../socket/typing";
+import { emitMarkAsReadEvent } from "../socket/conversation";
 
 const Conversation = () => {
     const { id } = useParams();
+    const roomId = id;
     const conversationContext = useOutletContext();
-    const userData = useSelector((state) => state.auth.userData);
-    const members = useSelector((state) => state.conversations.presence[id]) || [];
+    const userData = useSelector((state) => state.auth.userData) || {};
+    const members = useSelector((state) => state.conversations.presence[roomId]) || [];
+    const typingMembers = useSelector((state) => state.conversations.byId[roomId]?.typingUsers);
+    const unreadMessages = useSelector((state) => state.conversations.byId[roomId]?.unreadMessages);
+    const conversationMessages = useSelector(state => state.messages.byConversationId[roomId]) || [];
     const otherMemberFromContext = conversationContext?.members?.find(m => m._id !== userData._id);
     const otherMemberStatus = members?.find(m => m.userId !== userData?._id)?.status || "offline";
     const socket = useSocket();
@@ -21,31 +29,37 @@ const Conversation = () => {
     const bottomRef = useRef();
     const conversationPane = useRef();
     const navigate = useNavigate();
-    const roomId = id;
-    const [chats, setChats] = useState([]);
     const [closing, setClosing] = useState(false);
-
-    // playing area **************
-    const messages = useSelector(state => state.messages);
-    console.log(messages); 
-
+    
     // reference message
     const [referenceMsg, setReferenceMsg] = useState('');
     const [referenceMsgCreator, setReferenceMsgCreator] = useState('');
 
+    // message mark as read utilities
+    const [lastReadAt, setLastReadAt] = useState('');
+
     useEffect(() => {
+      if (!roomId || !userData?._id) return;
       joinRoom(socket, { conversationId: roomId });
-      const listener = listenForMessages(socket, dispatch, setChats);
 
-      return () => {
-        listener();
-        setChats([]);
-      } // cleanup function for listener
-    }, [roomId]);
+      // console.log(unreadMessages);
+      // console.log(conversationMessages);
 
+      unreadMessages?.forEach((unread) => {
+        emitMarkAsReadEvent(socket, { conversationId: roomId, messageId: unread.messageId, readerUsername: userData?.username, readerId: userData?._id, readTime: Date.now() });
+      })
+      // clear unread messages for this conversation
+      if(unreadMessages !== undefined){ 
+        dispatch(clearUnreadMessages({ conversationId: roomId }));
+        dispatch(resetUnread({ conversationId: roomId }));
+      }
+      
+    }, [roomId, userData?._id, conversationMessages]);
+      
+    // this is a funcationality for UI
     useEffect(() => {
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [chats]);
+    }, [conversationMessages]);
 
     const sendMessageHandler = (e) => {
         e.preventDefault();
@@ -57,10 +71,12 @@ const Conversation = () => {
           const referenceMessage = referenceMessageArea.innerText; 
           const referenceMessageCreator = referenceMsgCreator;
 
-          sendMessage(socket, { conversationId: roomId, message, messageCreator, referenceMessage, referenceMessageCreator });
-          
-          // update messages slice -> store messages in the store
-          dispatch(updateMessage({convoId: roomId, message: message, messageCreator: messageCreator, referenceMessage: referenceMessage, referenceMessageCreator: referenceMessageCreator}));
+          sendMessage(socket, { 
+            conversationId: roomId, 
+            message, messageCreator, 
+            referenceMessage, 
+            referenceMessageCreator 
+          });
           
           e.target[0].value = "";
           setReferenceMsg('');
@@ -77,6 +93,19 @@ const Conversation = () => {
     const handleCloseConversation = () => {
       setClosing(true);
       setTimeout(() => navigate(-1), 200);
+    }
+
+    // typing function handler
+    let typingTimeout;
+    const handleTypingEvent = () => {
+      // user started typing -> emit immediately
+      emitTypingEvent(socket, {conversationId: roomId, userId: userData?._id || ''});
+      // resets the previous timer created on each keyStroke
+      clearTimeout(typingTimeout);
+      // set timer for 3 seconds, if user stays inactive then fire not typing event
+      typingTimeout = setTimeout(() => {
+        emitNotTypingEvent(socket, {conversationId: roomId, userId: userData?._id || ''});
+      }, 3000)
     }
     
   return (
@@ -105,12 +134,13 @@ const Conversation = () => {
       </div>
 
       {/* ####### Chats ####### */}
-      <div id="chat-area" className="w-full my-6 mt-12 flex-1">
-        <div className="flex flex-col gap-y-2">
-          {chats.map((chat, index) => (
-            <Chat key={index} msgId={index} msg={chat.message} referenceMsg={chat.referenceMessage} creator={chat.messageCreator} referenceMsgCreator={chat.referenceMessageCreator} referenceMsgCreatorSetter={setReferenceMsgCreator} isOwn={chat.isOwn} time={chat.time} referenceMsgSetter={setReferenceMsg} convoType={conversationContext?.convoType || ''} />
+      <div id="chat-area" className="relative w-full my-6 mt-12 flex-1">
+        <div className={`flex flex-col gap-y-2 transition-all duration-300 ${typingMembers?.length > 0 ? "-translate-y-10" : "translate-y-0"}`}>
+          {conversationMessages?.map((chat, index) => (
+            <Chat key={index} msgId={index} msg={chat.message} referenceMsg={chat.referenceMessage} creator={chat.messageCreator} referenceMsgCreator={chat.referenceMessageCreator} referenceMsgCreatorSetter={setReferenceMsgCreator} isOwn={chat.isOwn} time={chat.time} referenceMsgSetter={setReferenceMsg} convoType={conversationContext?.convoType || ''} readReceipt={chat.readByAt?.some(c => c.readerId === otherMemberFromContext?._id)} />
           ))}
         </div>
+        <TypingIndicator isTyping={typingMembers?.length > 0} />
       </div>
 
       {/* Dummy DIV for bottom reference */}
@@ -163,6 +193,7 @@ const Conversation = () => {
             className="flex items-center w-full p-2"
           >
             <textarea
+              onChange={handleTypingEvent}
               onKeyDown={submissionHandler}
               rows={1}
               className="

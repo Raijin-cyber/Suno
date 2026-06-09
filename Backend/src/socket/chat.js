@@ -4,8 +4,9 @@ import formatTime from "../utilities/formatTime.js";
 // ****SOCKET-CHAT METHODS****
 
 const emitMessageEvent = (io, socket) => {
-    socket.on(SOCKET_EVENTS.MESSAGE_SEND, ({ senderId, conversationId, message, messageCreator, referenceMessage, referenceMessageCreator }) => {
+    socket.on(SOCKET_EVENTS.MESSAGE_SEND, ({ senderId, conversationId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator }) => {
         const payload = {
+            messageId: messageId,
             message: message,
             messageCreator: messageCreator,
             referenceMessage: referenceMessage,

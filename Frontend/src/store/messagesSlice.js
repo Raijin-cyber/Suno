@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     byConversationId: {
-        convoId: [{message: "", messageCreator: "", referenceMessage: "", referenceMessageCreator: ""}]
+        // convoId: [{message: "", messageCreator: "", referenceMessage: "", referenceMessageCreator: "", isOwn: true, time: "11:11", readByAt: [{userId, readTime}]}]
     }
 }
 
@@ -11,14 +11,31 @@ const messagesSlice = createSlice({
     initialState,
     reducers: {
         updateMessage: (state, action) => {
-            const { convoId, message, messageCreator, referenceMessage, referenceMessageCreator } = action.payload;
+            const { convoId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator, isOwn, time } = action.payload;
             // Ensure array exists
             if(!state.byConversationId[convoId]) {
                 state.byConversationId[convoId] = [];
             }
 
             // Push new message
-            state.byConversationId[convoId].push({ message, messageCreator, referenceMessage, referenceMessageCreator });
+            state.byConversationId[convoId].push({ messageId, message, messageCreator, referenceMessage, referenceMessageCreator, isOwn, time, readByAt: [] });
+        },
+        updateReadReceipt: (state, action) => {
+            const { convoId, messageId, readerUsername, readerId, readTime } = action.payload;
+
+            // Find that message
+            const targetMessage = state.byConversationId[convoId]?.find(msg => msg.messageId === messageId);
+            
+            // ensure targetMessage exists
+            if(!targetMessage) {
+                targetMessage.readByAt = [];
+            }
+
+            // prevent duplicates
+            const alreadyExists = targetMessage.readByAt.some(r => r.readerId === readerId);
+            if(!alreadyExists) {
+                targetMessage.readByAt.push({messageId, readerId, readerUsername, readTime});
+            }
         },
         setMessage: (state, action) => {
             const { convoId, message, messageCreator, referenceMessage, referenceMessageCreator } = action.payload;
@@ -28,4 +45,4 @@ const messagesSlice = createSlice({
 })
 
 export default messagesSlice.reducer;
-export const { updateMessage, setMessage } = messagesSlice.actions;
+export const { updateMessage, updateReadReceipt, setMessage } = messagesSlice.actions;

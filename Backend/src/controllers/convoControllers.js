@@ -1,6 +1,7 @@
 import Convo from "../models/convoModel.js";
 import User from "../models/userModel.js";
 import Request from "../models/requestModel.js";
+import UserConversation from "../models/userConversationModel.js";
 import { v4 as uuidv4 } from "uuid";
 import asyncHandler from "../utilities/asyncHandler.js"
 
@@ -59,6 +60,17 @@ const createConvo = asyncHandler(async(req, res, next) => {
             { new: true, upsert: true }
         );
 
+        const userConvos = [userA_ID, userB_ID].map(uid => ({
+            userId: uid,
+            convoId: convo.convoId,
+            role: "member",
+            lastReadAt: null,
+            mutedUntil: null,
+            pinned: false
+        }));
+
+        await UserConversation.insertMany(userConvos, { ordered: false });
+
         res.status(200).json({
             success: true,
             message: "Conversation created or retrieved successfully",
@@ -66,7 +78,7 @@ const createConvo = asyncHandler(async(req, res, next) => {
         });
     }
     else if(convoType === "group") {
-        if(typeof(participants_ID) !== "Array") {
+        if (!Array.isArray(participants_ID)) {
             res.status(400);
             throw new Error("Invalid data type for participants ID.");
         }
@@ -80,6 +92,24 @@ const createConvo = asyncHandler(async(req, res, next) => {
                 admin: userA_ID
             }
         )
+
+        const userConvos = participants_ID.map(uid => ({
+            userId: uid,
+            convoId: convo.convoId,
+            role: uid === userA_ID ? "admin" : "member",
+            lastReadAt: null,
+            mutedUntil: null,
+            pinned: false
+        }));
+
+        await UserConversation.insertMany(userConvos);
+
+        res.status(200);
+        res.json({
+            success: true,
+            message: "Successfully created a group",
+            result: convo,
+        })
     }
     else {
         res.status(400);

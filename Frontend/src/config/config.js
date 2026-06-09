@@ -37,3 +37,8 @@ export const NOTIFICATION_API = {
     receive: API_BASE_URL + "notification/receive",
     read: API_BASE_URL + "notification/read",
 }
+
+export const USER_CONVERSATION_API = {
+    fetch: API_BASE_URL + "userconvo", // "/userconvo/:userId/:convoId"
+    update: API_BASE_URL + "userconvo", // "/userconvo/:userId/:convoId"
+}

@@ -55,8 +55,8 @@ const Welcome = () => {
             <main className="w-full h-200 md:h-150 mt-[30%] sm:mt-[20%] md:mt-[10%] mb-[8%]">
                 <div className="md:justify-around h-full flex flex-col md:flex md:flex-row items-center">
                     <div className="md:self-start flex flex-col w-80 mb-[30%] sm:mb-[20%]">
-                        <p className="text-8xl md:text-9xl md:text-left text-center tracking-tighter">Suno.</p>
-                        <b className="md:text-xl md:text-left text-center tracking-tight">Fast, reliable, and secure communication.</b>
+                        <p className="text-8xl md:text-9xl md:text-left text-center tracking-tighter">Orbi.</p>
+                        <b className="md:text-xl md:text-left text-center tracking-tight">Connect without boundaries.</b>
                         <i className="md:text-xl block md:text-left text-center tracking-tighter">A modern chat experience designed for simplicity, speed, and style — where every conversation feels personal and polished.</i>
                     </div>
                     {/* Mobile phone */}

@@ -16,6 +16,7 @@ import convoRoutes from "./src/routes/convoRoutes.js";
 import messageRoutes from "./src/routes/messageRoutes.js";
 import requestRoutes from "./src/routes/requestRoutes.js";
 import notificationRoutes from "./src/routes/notificationRoutes.js";
+import userConversationRoutes from "./src/routes/userConversationRoutes.js";
 
 configDotenv(); // loads .env's content in process.env
 
@@ -44,6 +45,7 @@ app.use("/api/v1/convo", convoRoutes);
 app.use("/api/v1/message", messageRoutes);
 app.use("/api/v1/request", requestRoutes);
 app.use("/api/v1/notification", notificationRoutes);
+app.use("/api/v1/userconvo", userConversationRoutes);
 app.use(errorHandler);
 
 // start the http server only if the database is ready to connect

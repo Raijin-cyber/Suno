@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-const Chat = ({ msgId, msg, referenceMsg, creator, referenceMsgCreator, isOwn, time, referenceMsgSetter, referenceMsgCreatorSetter, convoType }) => {
+const Chat = ({ msgId, msg, referenceMsg, creator, referenceMsgCreator, isOwn, time, referenceMsgSetter, referenceMsgCreatorSetter, convoType, readReceipt }) => {
 
   const [showChatControls, setShowChatControls] = useState(false);
 
   const baseClasses =
-    "flex flex-col justify-between max-w-[90%] lg:max-w-2xl min-w-[5.25rem] px-3 py-2";
+    "relative flex flex-col justify-between max-w-[90%] lg:max-w-2xl min-w-[5.25rem] px-3 py-2";
 
   const ownClasses =
     "animate-fade-in-left animate-duration-[100ms] rounded-l-2xl rounded-br-2xl bg-[#fc94af] shadow-[inset_3px_3px_3px_#b56b7e,inset_-3px_-3px_3px_#ffbde0]";
@@ -38,6 +38,9 @@ const Chat = ({ msgId, msg, referenceMsg, creator, referenceMsgCreator, isOwn, t
 
         {/* Message */}
         <p id={`chat_bubble${msgId}`} className={`text-[1.10rem] text-gray-800 ${isOwn ? "self-end" : "self-start"}`}>{msg}</p>
+
+        {/* Read Receipt */}
+        {isOwn && <span className="absolute bottom-2.5 left-3"><img className="w-3" src={`/assets/icons/${readReceipt ? "blueTick" : "greenTick"}.png`} alt="tick" /></span>}
 
         {/* Timestamp */}
         <span className={`text-xs tracking-tight font-light ${isOwn ? "self-end" : "self-start"}`}>{time}</span>
