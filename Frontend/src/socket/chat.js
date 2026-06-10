@@ -1,4 +1,5 @@
 import { updateLastMessage, incrementUnread, updateUnreadMessages } from "../store/conversationsSlice";
+import { storeMessage } from "../services/messageServices";
 import { updateMessage } from "../store/messagesSlice";
 import { SOCKET_EVENTS } from "./socketEvents";
 
@@ -20,10 +21,16 @@ const leaveRoom = (socket, { conversationId }) => {
 };
 
 // Send a message to a conversation room
-const sendMessage = (socket, { conversationId, message, messageCreator, referenceMessage, referenceMessageCreator }) => {
-  const senderId = socket.id;
-  const messageId = Date.now();
-  socket.emit(SOCKET_EVENTS.MESSAGE_SEND, { senderId, conversationId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator });
+const sendMessage = (socket, { conversationId, referenceMessageId, message, messageCreator, referenceMessage, referenceMessageCreator }) => {
+  // store message to DB for persistency
+  storeMessage({id: conversationId, encryptedMessage: message, referenceMessageId: referenceMessageId})
+    .then((res) => {
+      console.log(res);
+      console.log(referenceMessageId);
+      const senderId = socket.id;
+      const messageId = res?.result._id;
+      socket.emit(SOCKET_EVENTS.MESSAGE_SEND, { senderId, conversationId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator });
+    })
 };
 
 // Listen for incoming messages
@@ -55,7 +62,7 @@ const listenForMessages = (socket, dispatch) => {
       }));
     }
     
-      dispatch(updateLastMessage({ conversationId, message, time }));
+    dispatch(updateLastMessage({ conversationId, message, time }));
     dispatch(incrementUnread({ conversationId }));
   });
 

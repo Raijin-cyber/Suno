@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const Chat = ({ msgId, msg, referenceMsg, creator, referenceMsgCreator, isOwn, time, referenceMsgSetter, referenceMsgCreatorSetter, convoType, readReceipt }) => {
+const Chat = ({ msgId, msg, referenceMsg, creator, referenceMsgCreator, isOwn, time, referenceMsgIdSetter, referenceMsgSetter, referenceMsgCreatorSetter, convoType, readReceipt }) => {
 
   const [showChatControls, setShowChatControls] = useState(false);
 
@@ -15,6 +15,9 @@ const Chat = ({ msgId, msg, referenceMsg, creator, referenceMsgCreator, isOwn, t
 
   const referenceMsgSetterHandler = (e) => {
     const chatBubble = document.getElementById(`chat_bubble${msgId}`);
+    referenceMsgIdSetter(msgId);
+
+    // right now we have to pass two parametric functions but we only need Ids
     referenceMsgSetter(chatBubble.innerText);
     referenceMsgCreatorSetter(creator);
   }

@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema({
     convoId: {
-        type:mongoose.Schema.Types.ObjectId,
-        ref: "Convo",
+        type: String,
         required: [true, "message can not exist without conversation"]
     },
     senderId: {

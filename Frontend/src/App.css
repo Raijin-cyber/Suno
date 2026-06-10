@@ -44,3 +44,22 @@ input:-webkit-autofill:focus {
         background-position: 0% 50%;
     }
 }
+
+/* Logo gradient */
+
+.gradient-text {
+  background: linear-gradient(
+    60deg,
+    #b409ab 15%,   /* darker red */
+    #ededed 40%,  /* strong orange */
+    #f1e023 60%,  /* deep blue */
+    #148d1a 100%  /* rich teal */
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+
+  font-family: 'Pacifico', cursive; /* cursive font */
+}
+

@@ -1,11 +1,12 @@
 import asyncHandler from "../utilities/asyncHandler.js";
 import Message from "../models/messageModel.js";
+import mongoose from "mongoose";
 
 //@desc creates a new message
 //@route " POST /api/v1/message/:id/create"
 //@access private
 const createMessage = asyncHandler(async (req, res, next) => {
-    const { encryptedMessage } = req.body;
+    const { encryptedMessage, referenceMessageId } = req.body;
     const convoId = req.params.id;
     const senderId = req.cookies.userA_ID;
 
@@ -22,7 +23,8 @@ const createMessage = asyncHandler(async (req, res, next) => {
     const newMessage = await Message.create({
         convoId: convoId,
         senderId: senderId,
-        encryptedText: encryptedMessage
+        encryptedText: encryptedMessage,
+        referenceMessage: referenceMessageId || null,
     });
 
     if (!newMessage) {
@@ -52,18 +54,32 @@ const getMessage = asyncHandler(async (req, res) => {
 
     let filter = { convoId };
 
-    if (lastMessageId) {
-        filter._id = { $lt: lastMessageId }; // fetch older messages
+    if (lastMessageId && mongoose.Types.ObjectId.isValid(lastMessageId)) {
+        filter._id = { $lt: new mongoose.Types.ObjectId(lastMessageId) };
     }
 
     const messages = await Message.find(filter)
         .sort({ createdAt: -1 }) // newest first
-        .limit(limit);
+        .limit(limit)
+        .populate({
+            path: "senderId",
+            select: "username",
+        })
+        .populate({
+            path: "referenceMessage",
+            select: "encryptedText senderId",
+            populate: {
+                path: "senderId",
+                select: "username",
+            },
+        });
 
     if(!messages) {
         throw(404);
         throw new Error("There are no messages for this conversation!");
     }
+
+    messages.reverse(); // reverse the order
 
     res.status(200).json({
         success: true,
@@ -71,6 +87,90 @@ const getMessage = asyncHandler(async (req, res) => {
     });
 })
 
+//@desc get messages
+//@route " GET /api/v1/message/:id/unrd-msg"
+//@access private
+const fetchUnreadMessage = asyncHandler(async(req, res, next) => {
+    const convoId = req.params.id;
+    const { userA_ID } = req.cookies;
+
+    // check for valid credentials
+    if(!convoId || !userA_ID) {
+        res.status(400);
+        throw new Error("Bad Request: convoId and userId are required.");
+    }
+
+    const unreadMessages = await Message.find({
+        convoId,
+        readByAt: { 
+            $not: { $elemMatch: { userId: userA_ID } } 
+        }
+    })
+    .sort({ createdAt: -1 })
+    .populate("senderId", "username")
+    .populate({
+        path: "referenceMessage",
+        select: "encryptedText senderId",
+        populate: { path: "senderId", select: "username" }
+    });
+
+    if(unreadMessages.length === 0) {
+        res.status(200);
+        res.json({
+            success: true,
+            message: "There are no unread messages",
+        });
+    }
+
+    unreadMessages.reverse();
+
+    res.status(200);
+    res.json({
+        success: true,
+        message: "unread messaeges fetched successfully.",
+        unreadMessages: unreadMessages,
+    })
+
+})
+
+//@desc mark mesages as read
+//@route " PATCH /api/v1/message/mark-read"
+//@access private
+const markAsReadMessage = asyncHandler(async(req, res, next) => {
+    const { messageId, readerId, readTime } = req.body;
+
+    // check for required Data
+    if( !messageId || !readerId || !readTime ) {
+        res.status(400);
+        throw new Error("Bad Request: messageId, readerId, readTime are required");
+    }
+
+    const updatedMessage = await Message.findByIdAndUpdate(
+        messageId,
+        {
+        $addToSet: {
+                readByAt: {
+                    userId: readerId,
+                    readAt: readTime || new Date() // or req.body.readAt if you want client‑side timestamp
+                }
+            }
+        },
+        { new: true }
+    );
+
+    if (!updatedMessage) {
+        res.status(404);
+        throw new Error("Message not found");
+    }
+
+    res.status(200);
+    res.json({
+        success: true,
+        message: "Message marked as read",
+        data: updatedMessage
+    });
+})
+ 
 //@desc update an existing message
 //@route " POST /api/v1/message/:id/update/:msgId"
 //@access private
@@ -156,7 +256,9 @@ const deleteMessage = asyncHandler(async(req, res, next) => {
 
 export {
     createMessage,
+    fetchUnreadMessage,
     getMessage,
+    markAsReadMessage,
     updateMessage,
     deleteMessage
 }

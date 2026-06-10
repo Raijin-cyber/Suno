@@ -1,13 +1,18 @@
+import store from "../store/store";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Outlet, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useSocket } from "../hooks/useSocket";
 import { useScreenWidth } from "../hooks/useScreenWidth";
+import { updateLastMessage, updateUnreadMessages } from "../store/conversationsSlice";
+import { fetchMessage, fetchUnreadMessage } from "../services/messageServices";
 import { getCurrentUser, logoutUser, searchUser } from "../services/authServices";
 import { receiveNotification, readNotification } from "../services/notificationServices";
 import { getAllUserConversation } from "../services/conversationServices";
 import { login, logout } from "../store/authSlice";
+import formateTime from "../utils/formatTime";
+import { updateMessage } from "../store/messagesSlice";
 import { useNavigate } from "react-router-dom";
 import Chatsnippet from "../components/Chatsnippet";
 import Notification from "../components/Notification";
@@ -74,7 +79,7 @@ const Home = () => {
         const messagesListener = listenForMessages(socket, dispatch);
         
         return () => {
-            emitOfflineEvent(socket, { userId: userData._id, conversationIds: conversations.map(c => c.convoId) });
+            emitOfflineEvent(socket, { userId: userData?._id, conversationIds: conversations.map(c => c.convoId) });
             onlineUserListner(); 
             offlineUserListner(); 
             typingUserListner(); 
@@ -83,6 +88,81 @@ const Home = () => {
             messagesListener();
         }
     }, [])
+
+    // fetching all user's messages
+    useEffect(() => {
+        conversations?.forEach((c) => {
+            // check if the messages are already fetched
+            const existingMessages = store.getState().messages.byConversationId[c.convoId];
+            if (existingMessages && existingMessages.length > 0) return;
+
+            (async() => {
+                fetchMessage(c.convoId, 20)
+                .then((m) => {
+                    m.messages.forEach((msg) => {
+                        if(msg) {
+                            // populating the messages store
+                            dispatch(updateMessage({
+                                convoId: c?.convoId,
+                                messageId: msg?._id,
+                                message: msg?.encryptedText,
+                                messageCreator: msg?.senderId.username,
+                                referenceMessage: msg?.referenceMessage?.encryptedText || '',
+                                referenceMessageCreator: msg?.referenceMessage?.senderId?.username || '',
+                                isOwn: msg?.senderId._id === userData?._id,
+                                readByAt: msg?.readByAt,
+                                time: formateTime(msg?.createdAt),
+                            }))
+                        }
+                    })
+
+                    // filling up the last message field of conversation store
+                    let lastMessageObj;
+                    if (m.messages && m.messages?.length > 0) {
+                        // assuming unreadMessages is sorted oldest → newest
+                        lastMessageObj = m.messages[m.messages.length - 1];
+                    }
+                    if (lastMessageObj) {
+                        dispatch(updateLastMessage({
+                            conversationId: lastMessageObj.convoId,
+                            message: lastMessageObj.encryptedText,
+                            time: formateTime(lastMessageObj.createdAt),
+                        }));
+                    }
+                })
+            })()
+        })
+    }, [conversations, userData?._id])
+
+    // fetching all user's unread messages
+    useEffect(() => {
+        conversations.forEach((c) => {
+            // check if the unread messages for this conversation are already fetched or not?
+            const existingUnreadMessages = store.getState().conversations.byId[c.convoId]?.unreadMessages.length;
+            if (existingUnreadMessages && existingUnreadMessages.length > 0) return;
+
+            (async() => {
+                fetchUnreadMessage(c.convoId)
+                .then((unreadMessages) => {
+                    unreadMessages?.forEach((um) => {
+                        // filling up the conversations store unread messages field
+                        dispatch(updateUnreadMessages({
+                            conversationId: c?.convoId,
+                            messageId: um?._id,
+                            message: um?.encryptedText,
+                            messageCreator: um?.senderId.username,
+                            referenceMessage: um?.referenceMessage?.encryptedText || '',
+                            referenceMessageCreator: um?.referenceMessage?.senderId?.username || '',
+                            isOwn: um?.senderId._id === userData?._id,
+                            readByAt: um?.readByAt,
+                            time: formateTime(um?.createdAt),
+                        }))
+                    })
+                }); 
+            })()
+        
+        })
+    }, [conversations, userData?._id])
 
     // mounting error event listener for ws connection
     useEffect(() => {
@@ -174,7 +254,7 @@ const Home = () => {
     const logoutHandler = () => {
         logoutUser()
         .then(() => {
-            emitOfflineEvent(socket, { userId: userData._id, conversationIds: conversations.map(c => c.convoId) });     // emit offline event when user logs out
+            emitOfflineEvent(socket, { userId: userData?._id, conversationIds: conversations.map(c => c.convoId) });     // emit offline event when user logs out
             dispatch(logout());       // clear Redux slice first
             socket.disconnect();      // then disconnect socket
             navigate("/");            // finally navigate
@@ -237,7 +317,7 @@ const Home = () => {
 
                             if (convo.convoType === "direct") {
                                 const recipient = convo.members.find(
-                                (member) => member._id.toString() !== userData._id
+                                (member) => member._id.toString() !== userData?._id
                                 );
                                 recipientName = recipient?.username;
                             }
@@ -345,7 +425,7 @@ const Home = () => {
                     }
 
                     {/* Chats */}
-                    <div className="h-full w-full p-5 flex flex-col overflow-y-auto overflow-x-hidden scrollbar-hide">
+                    <div className="h-full w-full">
                         {/* this for the chat sub page with the existing conversations */}
                         {id && <Outlet context={conversations.find((convo) => { if(id === convo.convoId) return convo })}/>}
                     </div>

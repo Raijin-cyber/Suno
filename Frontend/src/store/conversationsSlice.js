@@ -11,7 +11,7 @@ const ensureConvo = (state, conversationId) => {
       lastMessage: null,
       lastMessageTime: null,
       typingUsers: [],
-      unreadCount: 0,
+      unreadCount: null,
       unreadMessages: []
     };
   }
@@ -56,6 +56,11 @@ const conversationsSlice = createSlice({
     },
     updateUnreadMessages: (state, action) => {
       const { conversationId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator, time  } = action.payload;
+
+      // check if the array of unread messages exist 
+      if(!state.byId[conversationId]) {
+        state.byId[conversationId] = { unreadMessages: [] };
+      }
 
       // now store unread message
       state.byId[conversationId].unreadMessages.push({ conversationId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator, time });

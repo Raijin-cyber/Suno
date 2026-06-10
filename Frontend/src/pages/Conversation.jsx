@@ -32,6 +32,7 @@ const Conversation = () => {
     const [closing, setClosing] = useState(false);
     
     // reference message
+    const [referenceMessageId, setReferenceMessageId] = useState('');
     const [referenceMsg, setReferenceMsg] = useState('');
     const [referenceMsgCreator, setReferenceMsgCreator] = useState('');
 
@@ -42,17 +43,23 @@ const Conversation = () => {
       if (!roomId || !userData?._id) return;
       joinRoom(socket, { conversationId: roomId });
 
-      // console.log(unreadMessages);
-      // console.log(conversationMessages);
-
-      unreadMessages?.forEach((unread) => {
-        emitMarkAsReadEvent(socket, { conversationId: roomId, messageId: unread.messageId, readerUsername: userData?.username, readerId: userData?._id, readTime: Date.now() });
-      })
-      // clear unread messages for this conversation
-      if(unreadMessages !== undefined){ 
+      if(unreadMessages && unreadMessages.length > 0){
+        unreadMessages?.forEach((unread) => {
+          emitMarkAsReadEvent(socket, 
+            { conversationId: roomId, 
+              messageId: unread.messageId, 
+              readerUsername: userData?.username, 
+              readerId: userData?._id, 
+              readTime: Date.now() 
+            }
+          );
+        })
+        // clear unread messages for this conversation
         dispatch(clearUnreadMessages({ conversationId: roomId }));
-        dispatch(resetUnread({ conversationId: roomId }));
       }
+      dispatch(resetUnread({ conversationId: roomId }));
+
+      console.log(conversationMessages);
       
     }, [roomId, userData?._id, conversationMessages]);
       
@@ -71,11 +78,11 @@ const Conversation = () => {
           const referenceMessage = referenceMessageArea.innerText; 
           const referenceMessageCreator = referenceMsgCreator;
 
+          // v.0.2
           sendMessage(socket, { 
             conversationId: roomId, 
             message, messageCreator, 
-            referenceMessage, 
-            referenceMessageCreator 
+            referenceMessageId, referenceMessage, referenceMessageCreator 
           });
           
           e.target[0].value = "";
@@ -109,7 +116,7 @@ const Conversation = () => {
     }
     
   return (
-    <div ref={conversationPane} className={`${!closing ? "animate-slide-in-top" : "animate-fade-out-right animate-duration-200"} animate-duration-100 relative flex flex-col h-full w-full`}>
+    <div ref={conversationPane} className={`${!closing ? "animate-slide-in-top" : "animate-fade-out-right animate-duration-200"} overflow-y-scroll scrollbar-hide animate-duration-100 relative flex flex-col h-full w-full p-5`}>
       
       {/* ####### Header ####### */}
       <div className="z-10 sticky top-0 flex items-center justify-between rounded-2xl py-2 px-4 backdrop-blur-[1.5px] bg-[rgba(244,244,244,0.3)] border border-[rgba(255,255,255,0.1)]">
@@ -134,10 +141,10 @@ const Conversation = () => {
       </div>
 
       {/* ####### Chats ####### */}
-      <div id="chat-area" className="relative w-full my-6 mt-12 flex-1">
+      <div id="chat-area" className="relative w-full mt-12 flex-1 px-2">
         <div className={`flex flex-col gap-y-2 transition-all duration-300 ${typingMembers?.length > 0 ? "-translate-y-10" : "translate-y-0"}`}>
           {conversationMessages?.map((chat, index) => (
-            <Chat key={index} msgId={index} msg={chat.message} referenceMsg={chat.referenceMessage} creator={chat.messageCreator} referenceMsgCreator={chat.referenceMessageCreator} referenceMsgCreatorSetter={setReferenceMsgCreator} isOwn={chat.isOwn} time={chat.time} referenceMsgSetter={setReferenceMsg} convoType={conversationContext?.convoType || ''} readReceipt={chat.readByAt?.some(c => c.readerId === otherMemberFromContext?._id)} />
+            <Chat key={index} msgId={chat.messageId} msg={chat.message} referenceMsg={chat.referenceMessage} creator={chat.messageCreator} referenceMsgCreator={chat.referenceMessageCreator} isOwn={chat.isOwn} time={chat.time} referenceMsgIdSetter={setReferenceMessageId} referenceMsgCreatorSetter={setReferenceMsgCreator} referenceMsgSetter={setReferenceMsg} convoType={conversationContext?.convoType || ''} readReceipt={chat.readByAt?.some(c => c.readerId === otherMemberFromContext?._id || c.userId === otherMemberFromContext?._id)} />
           ))}
         </div>
         <TypingIndicator isTyping={typingMembers?.length > 0} />

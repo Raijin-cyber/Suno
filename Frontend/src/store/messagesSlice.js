@@ -11,14 +11,14 @@ const messagesSlice = createSlice({
     initialState,
     reducers: {
         updateMessage: (state, action) => {
-            const { convoId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator, isOwn, time } = action.payload;
+            const { convoId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator, isOwn, time, readByAt } = action.payload;
             // Ensure array exists
             if(!state.byConversationId[convoId]) {
                 state.byConversationId[convoId] = [];
             }
 
             // Push new message
-            state.byConversationId[convoId].push({ messageId, message, messageCreator, referenceMessage, referenceMessageCreator, isOwn, time, readByAt: [] });
+            state.byConversationId[convoId].push({ messageId, message, messageCreator, referenceMessage, referenceMessageCreator, isOwn, time, readByAt: readByAt || [] });
         },
         updateReadReceipt: (state, action) => {
             const { convoId, messageId, readerUsername, readerId, readTime } = action.payload;
@@ -26,7 +26,10 @@ const messagesSlice = createSlice({
             // Find that message
             const targetMessage = state.byConversationId[convoId]?.find(msg => msg.messageId === messageId);
             
-            // ensure targetMessage exists
+            // ensure target message exists
+            if (!targetMessage) return;
+
+            // ensure targetMessage readByAt array exists
             if(!targetMessage) {
                 targetMessage.readByAt = [];
             }
