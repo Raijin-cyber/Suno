@@ -8,7 +8,7 @@ const createConversation = async(convoType, userB_ID, participants_ID) => {
         const response = await api.post(CONVO_API.create, { convoType, userB_ID, participants_ID }, { withCredentials: true });
         return response.data.conversation;
     } catch (error) {
-        console.error("Error creating the conversation", error);
+        console.error("Error creating the conversation", error.message);
         return error;
     }
 }
@@ -19,19 +19,19 @@ const getAllUserConversation = async() => {
         const response = await api.post(CONVO_API.get, {}, { withCredentials: true });
         return response.data.conversations;
     } catch (error) {
-        console.error("Error getting user's conversations", error);
+        console.error("Error getting user's conversations", error.message);
         return error;
     }
 }
 
 // @ desc: PUT updates a conversation mostly for groups (e.g. removing user, changing admin)
 const updateConversation = async() => {
-    const conversation = await api.put()
+    // const conversation = await api.put()
 }
 
 // @ desc: DELTE deletes a conversation with a user
 const deleteConversation = async() => {
-    const conversation = await api.delete()
+    // const conversation = await api.delete()
 }
 
 export {

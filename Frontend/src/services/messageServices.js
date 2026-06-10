@@ -20,7 +20,7 @@ const fetchMessage = async(id, limit, lastMessageId) => {
         const response = await api.get(`${MESSAGE_API.get}/${id}/get/?lastMessageId=${lastMessageId}&limit=${limit}`, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error fetching messages from the database", error);
+        console.error("Error fetching messages from the database", error.message);
         return error;
     }
 }
@@ -44,7 +44,7 @@ const markAsReadMessage = async(messageId, readerId, readTime) => {
         const response = await api.patch(MESSAGE_API.read, { messageId, readerId, readTime }, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error fetching messages from the database", error);
+        console.error("Error fetching messages from the database", error.message);
         return error;
     }
 }
@@ -56,7 +56,7 @@ const updateMessage = async(id, msgId, newEncryptedMessage) => {
         const response = await api.put(`${MESSAGE_API.update}/${id}/update/${msgId}`, { newEncryptedMessage }, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error updating message on the database", error);
+        console.error("Error updating message on the database", error.message);
         return error;
     }
 }
@@ -68,7 +68,7 @@ const deleteMessage = async(id, msgId) => {
         const response = await api.delete(`${MESSAGE_API.delete}/${id}/delete/${msgId}`, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error deleting message on the database", error);
+        console.error("Error deleting message on the database", error.message);
         return error;
     }
 }

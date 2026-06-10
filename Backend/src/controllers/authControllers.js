@@ -109,7 +109,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
             {
                 httpOnly: true,
                 secure: true,
-                sameSite: "strict",
+                sameSite: "none",
                 maxAge: 7 * 24 * 60 * 60 * 1000
             }
         )
@@ -117,7 +117,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
             {
                 httpOnly: true,
                 secure: true,
-                sameSite: "strict",
+                sameSite: "none",
                 maxAge: 15 * 60 * 1000
             }
         )
@@ -125,7 +125,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
             {
                 httpOnly: true,
                 secure: true,
-                sameSite: "strict",
+                sameSite: "none",
                 maxAge: 15 * 60 * 1000
             }
         )
@@ -133,7 +133,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
             {
                 httpOnly: true,
                 secure: true,
-                sameSite: "strict",
+                sameSite: "none",
                 maxAge: 365 * 24 * 60 * 60 * 1000
             }
         )
@@ -204,7 +204,7 @@ const refreshToken = asyncHandler(async(req, res, next) => {
                     {
                         httpOnly: true,
                         secure: true,
-                        sameSite: "strict",
+                        sameSite: "none",
                         maxAge: 15 * 60 * 1000
                     }
                 )
@@ -212,7 +212,7 @@ const refreshToken = asyncHandler(async(req, res, next) => {
                     {
                         httpOnly: true,
                         secure: true,
-                        sameSite: "strict",
+                        sameSite: "none",
                         maxAge: 15 * 60 * 1000
                     }
                 )
@@ -237,28 +237,28 @@ const logoutUser = asyncHandler(async(req, res, next) => {
         {
             httpOnly: true,
             secure: true,
-            sameSite: "strict",
+            sameSite: "none",
         }
     );
     res.clearCookie("accessToken", 
         {
             httpOnly: true,
             secure: true,
-            sameSite: "strict",
+            sameSite: "none",
         }
     );
     res.clearCookie("wsToken", 
         {
             httpOnly: true,
             secure: true,
-            sameSite: "strict",
+            sameSite: "none",
         }
     );
     res.clearCookie("userA_ID", 
         {
             httpOnly: true,
             secure: true,
-            sameSite: "strict",
+            sameSite: "none",
         }
     );
     res.status(200)
@@ -332,7 +332,7 @@ const deleteUser = asyncHandler(async(req, res, next) => {
                 {
                     httpOnly: true,
                     secure: true,
-                    sameSite: "strict",
+                    sameSite: "none",
                 }
             );
             res.json(

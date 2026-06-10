@@ -7,7 +7,7 @@ const sendRequest = async(senderID, receiverID) => {
         const response = await api.post(REQUEST_API.send, { senderID, receiverID }, { withCredentials: true });
         return response.data.result;
     } catch (error) {
-        console.error("Error sending request: ", error);
+        console.error("Error sending request: ", error.message);
         return error;
     }
 }
@@ -18,7 +18,7 @@ const acceptRequest = async(requestID) => {
         const response = await api.put(REQUEST_API.accept, { requestID }, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error accepting request: ", error);
+        console.error("Error accepting request: ", error.message);
         return error;
     }
 }
@@ -28,7 +28,7 @@ const getRequestStatus = async() => {
         const response = await api.get(REQUEST_API.status, { withCredentials: true });
         return response.data.result;
     } catch (error) {
-        console.error("Error getting request status", error);
+        console.error("Error getting request status", error.message);
         return error;
     }
 }
@@ -39,7 +39,7 @@ const deleteRequest = async(requestId, userID) => {
         const response = await api.delete(REQUEST_API.delete, { requestId, userID }, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error deleting request: ", error);
+        console.error("Error deleting request: ", error.message);
         return error;
     }
 }

@@ -33,7 +33,7 @@ const loginUser = async(email, password) => {
             return response;
         }
     } catch (error) {
-        console.error("Invalid response or request", error);
+        console.error("Invalid response or request", error.message);
         throw error;
     }
 }
@@ -43,7 +43,7 @@ const getCurrentUser = async() => {
     try {
         return await api.get(AUTH_API.curruser, {withCredentials: true});
     } catch (error) {
-        console.error("Invalid response or request", error);
+        console.error("Invalid response or request", error.message);
         throw error;
     }
 }
@@ -66,7 +66,7 @@ const logoutUser = async() => {
             return response;
         }
     } catch (error) {
-        console.error("Failed to log-out");
+        console.error("Failed to log-out", error.message);
         throw error;
     }
 }
@@ -77,7 +77,7 @@ const searchUser = async(username) => {
         const response = await api.get(AUTH_API.search + username, { withCredentials: true });
         return response.data.results;
     } catch (error) {
-        console.error("Error occured while querying the user", error);
+        console.error("Error occured while querying the user", error.message);
     }
 }
 

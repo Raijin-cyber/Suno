@@ -7,7 +7,7 @@ const sendNotification = async(userB_ID, type, requestID) => {
         const response = await api.post(NOTIFICATION_API.send, { userB_ID, type, requestID }, { withCredentials: true });
         return response.data.result;
     } catch (error) {
-        console.error("Error occured while sending notification", error);
+        console.error("Error occured while sending notification", error.message);
         return error;
     }
 }
@@ -18,7 +18,7 @@ const receiveNotification = async() => {
         const response = await api.get(NOTIFICATION_API.receive, {}, { withCredentials: true });
         return response.data.result;
     } catch (error) {
-        console.error("Error occured while receivin notifignotification", error);
+        console.error("Error occured while receivin notifignotification", error.message);
         return error;
     }
 }
