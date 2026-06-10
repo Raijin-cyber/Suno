@@ -39,7 +39,6 @@ const Home = () => {
 
     // playing area *********************
     const chatSnippetData = useSelector((state) => {return state.conversations.byId}) || {};
-    // console.log(chatSnippetData);
     
     // Notification and alert logic
     const [ alert, setAlert ] = useState(true);
@@ -166,8 +165,9 @@ const Home = () => {
 
     // mounting error event listener for ws connection
     useEffect(() => {
-        listenForErrorforWs(socket, setError);
-    }, [error])
+        const cleanup = listenForErrorforWs(socket, setError);
+        return cleanup;
+    }, [socket])
 
     // heartbeat function for pinging the server to keep presence alive
     useEffect(() => {
@@ -203,7 +203,6 @@ const Home = () => {
         (async() => {
             receiveNotification()
             .then((res) => {
-                console.log(res);
                 setNotifications(res);
             }).
             catch((err) => setNotifications([]))

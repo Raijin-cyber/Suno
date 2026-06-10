@@ -58,8 +58,6 @@ const Conversation = () => {
         dispatch(clearUnreadMessages({ conversationId: roomId }));
       }
       dispatch(resetUnread({ conversationId: roomId }));
-
-      console.log(conversationMessages);
       
     }, [roomId, userData?._id, conversationMessages]);
       
