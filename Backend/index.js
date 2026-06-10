@@ -26,7 +26,7 @@ const app = express(); // this creates an express application
 const httpServer = http.createServer(app); // adding the functionality of our express such as route handling, adding middlewares, parsing, handling file uploads etc.
 export const io = new Server(httpServer, {
     cors: {
-        origin: ["http://localhost:5173"],
+        origin: ["http://localhost:5173", import.meta.env.FRONTEND_HOST],
         credentials: true
     },
     connectionStateRecovery: {
