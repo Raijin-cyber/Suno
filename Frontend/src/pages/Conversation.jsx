@@ -119,8 +119,8 @@ const Conversation = () => {
       {/* ####### Header ####### */}
       <div className="z-10 sticky top-0 flex items-center justify-between rounded-2xl py-2 px-4 backdrop-blur-[1.5px] bg-[rgba(244,244,244,0.3)] border border-[rgba(255,255,255,0.1)]">
           <div className="flex items-center gap-x-3">
-              <div onClick={handleCloseConversation} className="md:hidden cursor-pointer rounded-full active:bg-black/20 transition duration-120 object-cover"><img src="/assets/icons/back.png" alt="" /></div>
-              <div className="cursor-pointer rounded-full object-cover h-10 w-10 md:h-15 md:w-15"><img src="/assets/icons/user.png" alt="Panda" /></div>
+              <div onClick={handleCloseConversation} className="md:hidden cursor-pointer rounded-full active:bg-black/20 transition duration-120 object-cover"><img src="/assets/icons/back.png" alt="back" /></div>
+              <div className="cursor-pointer rounded-full object-cover h-10 w-10 md:h-15 md:w-15"><img src="/assets/icons/user.png" alt="user" /></div>
               <div className="flex flex-col items-start">
                   <span className="text-[1.10rem] md:text-xl tracking-tight">{conversationContext?.convoType === "direct" ? otherMemberFromContext?.username : "Group"}</span>
                   <span className="text-[0.8rem] md:text-xs font-light tracking-tight">{otherMemberStatus}</span>
