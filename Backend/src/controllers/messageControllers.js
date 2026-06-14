@@ -32,12 +32,13 @@ const createMessage = asyncHandler(async (req, res, next) => {
         throw new Error("Failed to create a message. Try again later.");
     }
 
-    res.status(201).json({
+    res.status(201);
+    res.json({
         success: true,
         message: "Message created successfully",
         result: newMessage
     });
-})
+});
 
 //@desc get messages
 //@route " POST /api/v1/message/:id/get"
@@ -81,11 +82,12 @@ const getMessage = asyncHandler(async (req, res) => {
 
     messages.reverse(); // reverse the order
 
-    res.status(200).json({
+    res.status(200);
+    res.json({
         success: true,
         messages
     });
-})
+});
 
 //@desc get messages
 //@route " GET /api/v1/message/:id/unrd-msg"
@@ -129,9 +131,9 @@ const fetchUnreadMessage = asyncHandler(async(req, res, next) => {
         success: true,
         message: "unread messaeges fetched successfully.",
         unreadMessages: unreadMessages,
-    })
+    });
 
-})
+});
 
 //@desc mark mesages as read
 //@route " PATCH /api/v1/message/mark-read"
@@ -169,7 +171,7 @@ const markAsReadMessage = asyncHandler(async(req, res, next) => {
         message: "Message marked as read",
         data: updatedMessage
     });
-})
+});
  
 //@desc update an existing message
 //@route " POST /api/v1/message/:id/update/:msgId"
@@ -214,7 +216,7 @@ const updateMessage = asyncHandler(async(req, res, next) => {
         deliveredAt: message.updatedAt, // using updatedAt as delivery timestamp
         result: message
     });
-})
+});
 
 //@desc delete a message
 //@route " POST /api/v1/message/:id/delete/:msgId"
@@ -252,7 +254,7 @@ const deleteMessage = asyncHandler(async(req, res, next) => {
             LastUpdatedAt: message.updatedAt,
         }
     });
-})
+});
 
 export {
     createMessage,
@@ -261,4 +263,4 @@ export {
     markAsReadMessage,
     updateMessage,
     deleteMessage
-}
+};

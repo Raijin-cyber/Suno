@@ -49,7 +49,7 @@ app.use("/api/v1/userconvo", userConversationRoutes);
 app.use(errorHandler);
 
 // start the http server only if the database is ready to connect
-connectDB()
+connectDB(5, 10000)
 .then(() => {
     httpServer.listen(PORT, () => console.log(`Server is listening on http://localhost:${PORT}/api/v1`));
 });

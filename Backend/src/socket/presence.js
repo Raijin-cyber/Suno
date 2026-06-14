@@ -26,8 +26,8 @@ const listenForOnlineUsersEvent = (io, socket) => {
                 io.to(conversationId).emit(SOCKET_EVENTS.PRESENCE_ONLINE, { conversationId, members });
             }
         }
-    })
-}
+    });
+};
 
 const listenForOfflineUsersEvent = (io, socket) => {
     socket.on(SOCKET_EVENTS.PRESENCE_OFFLINE, async({ userId, conversationIds }) => {
@@ -50,8 +50,8 @@ const listenForOfflineUsersEvent = (io, socket) => {
                 io.to(conversationId).emit(SOCKET_EVENTS.PRESENCE_OFFLINE, { conversationId, members });
             }
         }
-    })
-}
+    });
+};
 
 const listenForPresencePingEvent = (io, socket) => {
     socket.on(SOCKET_EVENTS.PRESENCE_PING, async ({ userId, conversationIds }) => {
@@ -65,10 +65,10 @@ const listenForPresencePingEvent = (io, socket) => {
         }
     });
 
-}
+};
 
 export {
     listenForOnlineUsersEvent,
     listenForOfflineUsersEvent,
     listenForPresencePingEvent
-}
+};

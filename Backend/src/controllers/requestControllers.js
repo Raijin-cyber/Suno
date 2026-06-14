@@ -22,7 +22,7 @@ const sendRequest = asyncHandler(async(req, res, next) => {
                 { sender: receiverID, receiver: senderID }
             ]
         }
-    )
+    );
 
     if(existingRequest) {
         res.status(409);
@@ -36,8 +36,8 @@ const sendRequest = asyncHandler(async(req, res, next) => {
         success: true,
         message: "request created",
         result: request,
-    })
-})
+    });
+});
 
 //@desc accepts a request message
 //@route " PUT /api/v1/request/accept"
@@ -59,7 +59,7 @@ const acceptRequest = asyncHandler(async(req, res, next) => {
     }
     
     if(request.status === "accepted") {
-        res.status(409)
+        res.status(409);
         throw new Error("Request already accepted");    
     }
 
@@ -77,8 +77,8 @@ const acceptRequest = asyncHandler(async(req, res, next) => {
     res.json({
         success: true,
         message: "Request accepted",
-    })
-})
+    });
+});
 
 //@desc Fetches request status
 //@route " Delete /api/v1/request/status"
@@ -104,8 +104,8 @@ const getRequestStatus = asyncHandler(async(req, res, next) => {
         success: true,
         message: "Request status fetched successfully",
         result: requestStatus,
-    })
-})
+    });
+});
 
 
 //@desc deletes a request message
@@ -115,7 +115,7 @@ const deleteRequest = asyncHandler(async(req, res, next) => {
     const { requestID } = req.body;
     const userA_ID  = req.cookies.userA_ID;
 
-    if(!requestID || !userID) {
+    if(!requestID || !userA_ID) {
         res.status(400);
         throw new Error("Bad Request: Request and user IDs are required!");
     }
@@ -128,7 +128,7 @@ const deleteRequest = asyncHandler(async(req, res, next) => {
     }   
 
     // authorization check
-    if (request.receiver.toString() !== userID && request.sender.toString() !== userID) {
+    if (request.receiver.toString() !== userA_ID && request.sender.toString() !== userA_ID) {
         res.status(403);
         throw new Error("Not authorized to delete this request.");
     }
@@ -140,12 +140,12 @@ const deleteRequest = asyncHandler(async(req, res, next) => {
     res.json({
         success: true,
         message: "Request deleted",
-    })
-})
+    });
+});
 
 export {
     sendRequest,
     acceptRequest,
     getRequestStatus,
     deleteRequest
-}
+};
