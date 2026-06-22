@@ -130,13 +130,24 @@ const getAllConvo = asyncHandler(async(req, res, next) => {
     }
 
     const conversations = await Convo.find(
-        { members: userA_ID }, 
-        { convoType: 1, convoId: 1 }
+        { members: userA_ID },
+        {
+            convoType: 1,
+            convoId: 1,
+            members: 1,
+            lastMessage: 1,
+            unreadCount: 1,
+            avatar: 1
+        }
     )
     .populate({
         path: "members",
         select: "username avatar"
-    });
+    })
+    .populate({
+        path: "lastMessage",
+        select: "encryptedText readByAt createdAt senderId"
+    }).sort({ updatedAt: -1 });
 
     if(!conversations) {
         res.status(404);

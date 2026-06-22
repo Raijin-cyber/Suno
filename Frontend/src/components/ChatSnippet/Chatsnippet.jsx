@@ -1,58 +1,62 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { useSocket } from "../hooks/useSocket";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { sendRequest } from "../services/requestServices";
-import { sendNotification } from "../services/notificationServices";
+import { useSocket } from "../../hooks/useSocket";
+import { sendRequest } from "../../services/requestServices";
+import { sendNotification } from "../../services/notificationServices";
 
-const Chatsnippet = ({ conversationId, userID, recipientAvatar, recipientName, conversationData }) => {
-    const socket = useSocket();
+const Chatsnippet = ({ userData=null, recipientID=null, recipientAvatar=null, recipientName=null,  conversationId=null, conversationData=null, setError }) => {
     const navigate = useNavigate();
-    const userData = useSelector((state) => {return state.auth.userData});
     const [ requestBtnState, setRequestBtnState] = useState(false);
 
     // This function takes the user to conversation page
-    const roomHandler = () => {
+    const roomHandler = useCallback(() => {
         if(!conversationId) return;
         navigate(`/home/convo/${conversationId}`);
-    }
+    }, [conversationId])
 
     // this function created a chat request and send a notification to the user
-    const requestHandler = async() => {
-        if(userData) {
-            console.log("UserData", userData);
-            sendRequest(userData._id, userID)
-            .then(async(req) => {
-                setRequestBtnState(true);
-                await sendNotification(userID, "request", req._id);
-            })
-            .catch((error) => {
-                setRequestBtnState(false)
-            });
-        }
-    }
+    const requestHandler = useCallback(async() => {
+        sendRequest(userData?._id, recipientID)
+        .then((res) => {
+            setRequestBtnState(true);
+            sendNotification(recipientID, "request", res._id).then(() => setRequestBtnState(false));
+        })
+        .catch((error) => setError(error))
+    }, [userData]);
 
     return(
         <div onClick={roomHandler} className={`backdrop-blur-[1.5px] bg-[rgba(255,255,255,0.3)] border border-[rgba(255,255,255,0.1)] flex items-center justify-between w-full p-2 rounded-2xl transition duration-100 ${conversationId && "hover:bg-black/20 active:bg-black/20"}`}>
             <div className="flex items-center gap-3 w-[85%]">
                 {/* Avatar */}
                 <div className="w-12">
-                    <img src="/assets/icons/user.png" />    
+                    {recipientAvatar ? <img src={recipientAvatar} alt="avatar" /> : <img src={`/avatars/${recipientName[0].toUpperCase()}.png`} alt="avatar"/>}    
                 </div>    
 
                 {/* Main Content */}
                 <div className="flex flex-col flex-1 items-start min-w-0">
                     <p className="font-semibold">{recipientName}</p>
-                    <p className="text-[0.85rem] line-clamp-1 break-all">
-                        {conversationData?.lastMessage || <i>No messages to show</i>}
-                    </p>
+                    { 
+                        conversationId &&
+                        <p className="text-[0.85rem] line-clamp-1 break-all">
+                            {conversationData?.lastMessage || <i>No messages to show</i>}
+                        </p>
+                    }
                 </div>
             </div>
 
             {/* Time and unread messages and notification button */}
             <div className="flex flex-col min-w-[20%] items-end gap-y-2">
                 {!conversationId &&
-                    <button disabled={requestBtnState} onClick={requestHandler} className={`${requestBtnState ? "bg-transparent text-black border-2" : "bg-gray-800 text-white border-none"} xl:min-w-25 p-2 rounded-2xl text-[0.8rem]`}>{requestBtnState ? "Requested" : "Send Request"}</button>
+                    <button 
+                        disabled={requestBtnState} 
+                        onClick={requestHandler} 
+                        className={` 
+                            bg-[#0A2947] text-white cursor-pointer
+                            xl:min-w-25 px-2 py-3 rounded-xl text-[0.8rem]    
+                        `}
+                    >
+                            {requestBtnState ? "Requested" : "Request"}
+                    </button>
                 }
                 
                 {conversationData && <span className="text-xs">{conversationData.lastMessageTime}</span>}

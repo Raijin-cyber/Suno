@@ -16,3 +16,13 @@ convoRoutes.route("/update/:id").put(updateConvo);
 convoRoutes.route("/delete/:id").delete(deleteConvo);
 
 export default convoRoutes;
+
+// INDEPENDENT EVOLUTION IS THE GOAL
+
+// FUTURE UPDATE
+/*
+    PATCH /convo/:id/last-message
+    POST /convo/:id/members
+    DELETE /convo/:id/members
+    PATCH /convo/:id/admin 
+*/

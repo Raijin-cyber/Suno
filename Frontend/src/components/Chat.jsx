@@ -13,7 +13,7 @@ const Chat = ({ msgId, msg, referenceMsg, creator, referenceMsgCreator, isOwn, t
   const otherClasses =
     "animate-fade-in-right animate-duration-[100ms] rounded-bl-2xl rounded-r-2xl bg-[#fc94af] shadow-[3px_3px_2px_#b56b7e,-2px_-2px_2px_#ffbde0]";
 
-  const referenceMsgSetterHandler = (e) => {
+  const referenceMsgSetterHandler = () => {
     const chatBubble = document.getElementById(`chat_bubble${msgId}`);
     referenceMsgIdSetter(msgId);
 

@@ -1,6 +1,7 @@
 import asyncHandler from "../utilities/asyncHandler.js";
 import Message from "../models/messageModel.js";
 import mongoose from "mongoose";
+import Convo from "../models/convoModel.js";
 
 //@desc creates a new message
 //@route " POST /api/v1/message/:id/create"
@@ -31,6 +32,19 @@ const createMessage = asyncHandler(async (req, res, next) => {
         res.status(500);
         throw new Error("Failed to create a message. Try again later.");
     }
+
+    const convo = await Convo.findOneAndUpdate({ convoId: convoId }, 
+        { lastMessage: 
+            { 
+                encryptedText: encryptedMessage, 
+                senderId: senderId,
+                createdAt: newMessage.createdAt, 
+            } 
+        }, 
+        { 
+            returnDocument: "after" 
+        }
+    );
 
     res.status(201);
     res.json({

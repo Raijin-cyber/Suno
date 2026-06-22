@@ -16,6 +16,21 @@ const convoSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     }],
+    lastMessage: {
+        encryptedText: String,
+        senderId: mongoose.Schema.Types.ObjectId,
+        createdAt: Date
+    },
+    unreadCount: [{
+        userId:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:"User"
+        },
+        count:{
+            type:Number,
+            default:0
+        }
+    }],
     admin: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

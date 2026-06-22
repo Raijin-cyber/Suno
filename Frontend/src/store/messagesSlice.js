@@ -43,9 +43,10 @@ const messagesSlice = createSlice({
         setMessage: (state, action) => {
             const { convoId, message, messageCreator, referenceMessage, referenceMessageCreator } = action.payload;
             state.byConversationId[convoId] = { message, messageCreator, referenceMessage, referenceMessageCreator };
-        }
+        },
+        resetMessages: () => initialState
     }
 })
 
 export default messagesSlice.reducer;
-export const { updateMessage, updateReadReceipt, setMessage } = messagesSlice.actions;
+export const { updateMessage, updateReadReceipt, setMessage, resetMessages } = messagesSlice.actions;

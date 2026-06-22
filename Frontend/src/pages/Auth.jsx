@@ -16,13 +16,13 @@ const Auth = () => {
     const dispatch = useDispatch();
     const socket = useSocket();
 
-    const status = useSelector((state) => state.auth.status);
+    const status = useSelector((state) => state.auth?.status);
 
     useEffect(() => {
         if(status) {
             navigate("/home");
         }
-    }, [status])
+    }, [status, navigate])
 
     const registerFormHandler = (formData) => {
         setIsLoading(true);

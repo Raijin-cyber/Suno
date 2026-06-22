@@ -3,7 +3,7 @@ import TypingIndicator from "../components/TypingIndicator";
 import { useDispatch, useSelector } from "react-redux";
 import { clearUnreadMessages, resetUnread } from "../store/conversationsSlice"; 
 import { updateMessage, setMessage } from "../store/messagesSlice";
-import { sendMessage, joinRoom, leaveRoom, listenForMessages } from "../socket/chat";
+import { sendMessage, joinRoom } from "../socket/chat";
 import { useSocket } from "../hooks/useSocket";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
@@ -120,7 +120,7 @@ const Conversation = () => {
       <div className="z-10 sticky top-0 flex items-center justify-between rounded-2xl py-2 px-4 backdrop-blur-[1.5px] bg-[rgba(244,244,244,0.3)] border border-[rgba(255,255,255,0.1)]">
           <div className="flex items-center gap-x-3">
               <div onClick={handleCloseConversation} className="md:hidden cursor-pointer rounded-full active:bg-black/20 transition duration-120 object-cover"><img src="/assets/icons/back.png" alt="back" /></div>
-              <div className="cursor-pointer rounded-full object-cover h-10 w-10 md:h-15 md:w-15"><img src="/assets/icons/user.png" alt="user" /></div>
+              <div className="cursor-pointer rounded-full object-cover h-10 w-10 md:h-15 md:w-15"><img src={`/avatars/${otherMemberFromContext?.username[0].toUpperCase()}.png`} alt="avatar" /></div>
               <div className="flex flex-col items-start">
                   <span className="text-[1.10rem] md:text-xl tracking-tight">{conversationContext?.convoType === "direct" ? otherMemberFromContext?.username : "Group"}</span>
                   <span className="text-[0.8rem] md:text-xs font-light tracking-tight">{otherMemberStatus}</span>

@@ -1,8 +1,9 @@
 // App.jsx
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { login, logout } from "./store/authSlice";
+import { resetStore } from "./store/storeFn";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "./store/authSlice";
 import { getCurrentUser } from "./services/authServices";
 import Conversation from "./pages/Conversation";
 import { Auth, Welcome, About, Home, UserSearchPage, ErrorPage } from "./pages/pageImports";
@@ -48,8 +49,11 @@ const appRoutes = createBrowserRouter([
 function App() {
   const dispatch = useDispatch();
   const socket = useSocket();
+  const userData = useSelector((state) => state.auth.userData);
 
   useEffect(() => {
+    if(userData) return;
+
     getCurrentUser()
       .then((res) => {
         console.log(res);
@@ -58,9 +62,9 @@ function App() {
       })
       .catch((err) => {
         console.error("Error verifying session:", err);
-        dispatch(logout());
+        resetStore();
       });
-  }, [dispatch]);
+  }, [userData, dispatch, socket]);
 
   return <RouterProvider router={appRoutes} onError={errorHandler} />;
 }

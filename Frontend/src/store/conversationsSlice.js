@@ -68,7 +68,8 @@ const conversationsSlice = createSlice({
     clearUnreadMessages: (state, action) => {
       const { conversationId } = action.payload;
       state.byId[conversationId].unreadMessages = [];
-    }
+    },
+    resetConversations: () => initialState
   }
 });
 
@@ -81,5 +82,6 @@ export const {
   incrementUnread,
   resetUnread,
   updateUnreadMessages,
-  clearUnreadMessages
+  clearUnreadMessages,
+  resetConversations,
 } = conversationsSlice.actions;
