@@ -1,20 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import {  useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
-
-import { useSocket } from "../hooks/useSocket";
 import { useScreenWidth } from "../hooks/useScreenWidth";
 
-import { logoutUser, searchUser } from "../services/authServices";
-import { readNotification } from "../services/notificationServices";
-
-import Silk from "../React-Bites Components/Silk";
 import Notification from "../components/Notification";
 import Dashboard from "../components/Dashboard/Dashboard";
 import Chatsnippet from "../components/Chatsnippet/Chatsnippet";
 import NotificationPane from "../components/NotificationPane/NotificationPane";
-
-import { resetStore } from "../store/storeFn";
 
 import useJoinRooms from "../hooks/useJoinRooms";
 import useMountListeners from "../hooks/useMountListeners";
@@ -24,8 +16,6 @@ import useListenForWSConnErrors from "../hooks/useListenForWSConnErrors";
 
 
 const Home = () => {
-    const socket = useSocket();
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id, mode } = useParams();
     const screenWidth = useScreenWidth();
@@ -35,10 +25,7 @@ const Home = () => {
     const userData = useSelector(state => state.auth.userData);
     const chatSnippetData = useSelector(state => state.conversations.byId) || {};
     
-    // Notification and alert logic
-    const timerRef = useRef(null);
-    const longPressTriggered = useRef(false);
-    const [ alert, setAlert ] = useState(true);
+    // Notification state
     const [isNotifiOpen, setIsNotifiOpen] = useState(false);
     
     // Error variable for storing error state
@@ -171,7 +158,7 @@ const Home = () => {
 
             {/* message pane */}
             {(isConversationOpen || screenWidth >= 768) &&
-                <div id="right pane" className="overflow-hidden scrollbar-hide absolute max-md:h-screen max-md:w-screen md:relative md:block md:w-[70%] md:shadow-[inset_6px_6px_5px_#de829a,inset_-6px_-6px_5px_#ffa6c4] md:m-3 rounded-3xl bg-[#fc94Af]">
+                <div id="right pane" className="overflow-hidden scrollbar-hide absolute max-md:h-screen max-md:w-screen md:relative md:block md:w-[70%] md:shadow-[inset_6px_6px_5px_#de829a,inset_-6px_-6px_5px_#ffa6c4] md:m-3 rounded-3xl bg-[#fc94Af] z-20">
                 
                     {/* Message when no conversation is opened */}
                     {

@@ -56,6 +56,7 @@ const Ellipsis = ({
                     <span className="cursor-pointer">Language</span>
                     <span className="cursor-pointer">Clear cache</span>
                     <span className="cursor-pointer">Settings</span>
+                    <span className="cursor-pointer">Credits</span>
                     <span className="cursor-pointer">Support</span>
                 </div>
         </div>

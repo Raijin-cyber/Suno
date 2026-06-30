@@ -28,7 +28,7 @@ const sendMessage = (socket, { conversationId, referenceMessageId, message, mess
       console.log(res);
       console.log(referenceMessageId);
       const senderId = socket.id;
-      const messageId = res?.result._id;
+      const messageId = res?.result?._id;
       socket.emit(SOCKET_EVENTS.MESSAGE_SEND, { senderId, conversationId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator });
     })
 };

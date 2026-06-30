@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const LoadingScreen = ({ child }) => {
     const [loading, setLoading] = useState(true);
 
-    setTimeout(() => {
-        setLoading(false);
-    }, 3000);
+    useEffect(() => {
+        const loadTimeout = setTimeout(() => {
+            setLoading(false);
+        }, 3000);
+
+        return () => {
+            clearTimeout(loadTimeout);
+        }
+    }, [])
 
     // loading screen
     return (
