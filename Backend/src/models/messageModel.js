@@ -19,7 +19,7 @@ const messageSchema = new mongoose.Schema({
         ref: "Message", // points to another message
         default: null,
     },
-    IsEdited: {
+    isEdited: {
         type: Boolean,
         default: false,
     },
@@ -37,7 +37,7 @@ const messageSchema = new mongoose.Schema({
     {
         timestamps: true
     }
-)
+);
 
 const Message = mongoose.model("Message", messageSchema);
 export default Message;

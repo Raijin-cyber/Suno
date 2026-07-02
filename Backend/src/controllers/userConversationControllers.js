@@ -14,7 +14,7 @@ const fetchUserConversationDetails = asyncHandler(async(req, res, next) => {
             userId: userId,
             convoId: convoId,
         }
-    )
+    );
 
     if (!userConvo) {
         res.status(404);
@@ -26,8 +26,8 @@ const fetchUserConversationDetails = asyncHandler(async(req, res, next) => {
         success: true,
         message: "User conversation meta data fetched successfully.",
         userConvo: userConvo
-    })
-})
+    });
+});
 
 
 const updateUserConversationDetails = asyncHandler(async(req, res, next) => {
@@ -49,7 +49,7 @@ const updateUserConversationDetails = asyncHandler(async(req, res, next) => {
             userId: userId,
             convoId: convoId,
         }
-    )
+    );
 
     if (!userConvo) {
         res.status(404);
@@ -62,17 +62,17 @@ const updateUserConversationDetails = asyncHandler(async(req, res, next) => {
     userConvo.pinned = pinned ?? userConvo.pinned;
 
 
-    const newUserConvo = await userConvo.save()
+    const newUserConvo = await userConvo.save();
 
     res.status(200);
     res.json({
         success: true,
         message: "User conversation meta data fetched successfully.",
-    })
+    });
 
-})
+});
 
 export {
     fetchUserConversationDetails,
     updateUserConversationDetails
-}
+};

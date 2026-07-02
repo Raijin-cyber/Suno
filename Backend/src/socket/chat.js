@@ -18,8 +18,8 @@ const emitMessageEvent = (io, socket) => {
 
         io.to(conversationId).emit(SOCKET_EVENTS.MESSAGE_RECEIVE, payload);
     });
-}
+};
 
 export {
     emitMessageEvent,
-}
+};

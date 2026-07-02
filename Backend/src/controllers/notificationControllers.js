@@ -37,7 +37,8 @@ const sendNotification = asyncHandler(async (req, res, next) => {
         type: type,
     });
 
-    res.status(201).json({
+    res.status(201);
+    res.json({
         success: true,
         message: "Notification sent successfully",
         result: notification,
@@ -69,8 +70,8 @@ const receiveNotification = asyncHandler(async(req, res, next) => {
         success: true,
         message: "Notifications are fetched successfully.",
         result: notifications,
-    })
-})
+    });
+});
 
 //@desc marks unread notification as marked 
 //@route " POST /api/v1/notification/read"
@@ -86,17 +87,17 @@ const readNotification = asyncHandler(async(req, res, next) => {
     const result = await Notification.updateMany(
         {receiver: userA_ID, status: "unread"},
         {$set: { status: "read" }}
-    )
+    );
 
     res.status(200);
     res.json({
         success: true,
         message: "Unread messages are marked as read."
-    })
-})
+    });
+});
 
 export {
     sendNotification,
     receiveNotification,
     readNotification
-}
+};

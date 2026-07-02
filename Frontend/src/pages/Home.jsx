@@ -1,271 +1,68 @@
-import store from "../store/store";
-import { useEffect, useRef, useState } from "react";
+import {  useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { Outlet, useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useSocket } from "../hooks/useSocket";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import { useScreenWidth } from "../hooks/useScreenWidth";
-import { updateLastMessage, updateUnreadMessages } from "../store/conversationsSlice";
-import { fetchMessage, fetchUnreadMessage } from "../services/messageServices";
-import { getCurrentUser, logoutUser, searchUser } from "../services/authServices";
-import { receiveNotification, readNotification } from "../services/notificationServices";
-import { getAllUserConversation } from "../services/conversationServices";
-import { login, logout } from "../store/authSlice";
-import formateTime from "../utils/formatTime";
-import { updateMessage } from "../store/messagesSlice";
-import { useNavigate } from "react-router-dom";
-import Chatsnippet from "../components/Chatsnippet";
-import Notification from "../components/Notification";
-import NotificationSnippet from "../components/NotificationSnippet";
-import listenForErrorforWs from "../socket/ErrorEvent";
-import Silk from "../React-Bites Components/Silk";
 
-// socket related imports
-import { joinRooms, listenForMessages } from "../socket/chat";
-import { listenForOnlineUsersEvent, listenForOfflineUsersEvent, emitOnlineEvent, emitOfflineEvent, emitPresencePingEvent } from "../socket/presence";
-import { listenForTypingEvent, listenForNotTypingEvent } from "../socket/typing";
-import { listenForMarkAsReadEvent } from "../socket/conversation";
+import Notification from "../components/Notification";
+import Dashboard from "../components/Dashboard/Dashboard";
+import Chatsnippet from "../components/Chatsnippet/Chatsnippet";
+import NotificationPane from "../components/NotificationPane/NotificationPane";
+
+import useJoinRooms from "../hooks/useJoinRooms";
+import useMountListeners from "../hooks/useMountListeners";
+import useConversations from "../hooks/useConversations";
+import useNotifications from "../hooks/useNotifications";
+import useListenForWSConnErrors from "../hooks/useListenForWSConnErrors";
 
 
 const Home = () => {
-    const [loading, setLoading] = useState(false);
-    const { id, mode } = useParams();
-    const userData = useSelector((state) => {return state.auth.userData});
-    const socket = useSocket();
-    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { id, mode } = useParams();
     const screenWidth = useScreenWidth();
     const [addButtonState, setAddButtonState] = useState(false);
-
-    // playing area *********************
-    const chatSnippetData = useSelector((state) => {return state.conversations.byId}) || {};
     
-    // Notification and alert logic
-    const [ alert, setAlert ] = useState(true);
+    // Fetching from the Redux Store
+    const userData = useSelector(state => state.auth.userData);
+    const chatSnippetData = useSelector(state => state.conversations.byId) || {};
+    
+    // Notification state
     const [isNotifiOpen, setIsNotifiOpen] = useState(false);
-    const timerRef = useRef(null);
-    const longPressTriggered = useRef(false);
-
-    // This logic is for debounced search bar
-    const [query, setQuery] = useState('');
-    const [debouncedQuery, setDebouncedQuery] = useState(query);
-
-    // Users list, it is for creating a new conversation
-    const [users, setUsers] = useState([]);
     
-    // Conversation list, it is for opening the previuos conversation
-    const [conversations, setConversations] = useState([]);
-
-    // Flag for rooms if they are joined or not
-    const [isJoined, setIsJoined] = useState(false);
-
-    // Notification list of a user
-    const [notifications, setNotifications] = useState([]);
-
     // Error variable for storing error state
-    const [error, setError] = useState('');
-
+    const [error, setError] = useState(null);
+    
+    // states regarding conversation pane
     const isConversationOpen = !!id
     const showPlaceholder = !isConversationOpen && screenWidth >= 768;
 
-    // mounting neccessary listener for ws connection
-    useEffect(() => {
-        const onlineUserListner =  listenForOnlineUsersEvent(socket, dispatch);
-        const offlineUserListner = listenForOfflineUsersEvent(socket, dispatch);
-        const typingUserListner = listenForTypingEvent(socket, dispatch);
-        const notTypingUserListner = listenForNotTypingEvent(socket, dispatch);
-        const markAsReadListner = listenForMarkAsReadEvent(socket, dispatch);
-        const messagesListener = listenForMessages(socket, dispatch);
-        
-        return () => {
-            emitOfflineEvent(socket, { userId: userData?._id, conversationIds: conversations.map(c => c.convoId) });
-            onlineUserListner(); 
-            offlineUserListner(); 
-            typingUserListner(); 
-            notTypingUserListner(); 
-            markAsReadListner();
-            messagesListener();
-        }
-    }, [])
+    const [query, setQuery] = useState(null);
 
-    // fetching all user's messages
-    useEffect(() => {
-        conversations?.forEach((c) => {
-            // check if the messages are already fetched
-            const existingMessages = store.getState().messages.byConversationId[c.convoId];
-            if (existingMessages && existingMessages.length > 0) return;
-
-            (async() => {
-                fetchMessage(c.convoId, 20)
-                .then((m) => {
-                    m.messages.forEach((msg) => {
-                        if(msg) {
-                            // populating the messages store
-                            dispatch(updateMessage({
-                                convoId: c?.convoId,
-                                messageId: msg?._id,
-                                message: msg?.encryptedText,
-                                messageCreator: msg?.senderId.username,
-                                referenceMessage: msg?.referenceMessage?.encryptedText || '',
-                                referenceMessageCreator: msg?.referenceMessage?.senderId?.username || '',
-                                isOwn: msg?.senderId._id === userData?._id,
-                                readByAt: msg?.readByAt,
-                                time: formateTime(msg?.createdAt),
-                            }))
-                        }
-                    })
-
-                    // filling up the last message field of conversation store
-                    let lastMessageObj;
-                    if (m.messages && m.messages?.length > 0) {
-                        // assuming unreadMessages is sorted oldest → newest
-                        lastMessageObj = m.messages[m.messages.length - 1];
-                    }
-                    if (lastMessageObj) {
-                        dispatch(updateLastMessage({
-                            conversationId: lastMessageObj.convoId,
-                            message: lastMessageObj.encryptedText,
-                            time: formateTime(lastMessageObj.createdAt),
-                        }));
-                    }
-                })
-            })()
-        })
-    }, [conversations, userData?._id])
-
-    // fetching all user's unread messages
-    useEffect(() => {
-        conversations.forEach((c) => {
-            // check if the unread messages for this conversation are already fetched or not?
-            const existingUnreadMessages = store.getState().conversations.byId[c.convoId]?.unreadMessages.length;
-            if (existingUnreadMessages && existingUnreadMessages.length > 0) return;
-
-            (async() => {
-                fetchUnreadMessage(c.convoId)
-                .then((unreadMessages) => {
-                    unreadMessages?.forEach((um) => {
-                        // filling up the conversations store unread messages field
-                        dispatch(updateUnreadMessages({
-                            conversationId: c?.convoId,
-                            messageId: um?._id,
-                            message: um?.encryptedText,
-                            messageCreator: um?.senderId.username,
-                            referenceMessage: um?.referenceMessage?.encryptedText || '',
-                            referenceMessageCreator: um?.referenceMessage?.senderId?.username || '',
-                            isOwn: um?.senderId._id === userData?._id,
-                            readByAt: um?.readByAt,
-                            time: formateTime(um?.createdAt),
-                        }))
-                    })
-                }); 
-            })()
-        
-        })
-    }, [conversations, userData?._id])
-
-    // mounting error event listener for ws connection
-    useEffect(() => {
-        const cleanup = listenForErrorforWs(socket, setError);
-        return cleanup;
-    }, [socket])
-
-    // heartbeat function for pinging the server to keep presence alive
-    useEffect(() => {
-        const interval = setInterval(() => {
-            emitPresencePingEvent(socket, { userId: userData._id, conversationIds: conversations.map(c => c.convoId) });
-        }, 30000); // every 30 seconds
-
-        return () => clearInterval(interval);
-    }, [conversations]);
+    // mounting necessarry listeners
+    useMountListeners();
+    useListenForWSConnErrors(setError);
 
     // fetch all user's conversations
-    useEffect(() => {
-        (async() => {
-            await getAllUserConversation()
-            .then((convo) => {
-                setConversations(convo);
-                if(conversations) emitOnlineEvent(socket, { userId: userData._id, conversationIds: conversations.map(c => c.convoId) });
-            })
-            .catch((err) => setConversations([]))
-        })()
-    }, [notifications])
+    const { 
+        conversations, 
+        error: conversationError, 
+        loading: conversationLoading, 
+        refresh: converastionRefresh 
+    } = useConversations();
 
-    // connect user to all existing conversations(room with conversation ID)
-    useEffect(() => {
-        if(!isJoined && conversations.length > 0) {
-            joinRooms(socket, {roomIds: conversations.map(c => c.convoId)});
-            setIsJoined(true);
-        }
-    }, [conversations, isJoined]);
+    // establish socket conn with convos
+    useJoinRooms(conversations);
 
     // fetch all user's notifications
-    useEffect(() => {
-        (async() => {
-            receiveNotification()
-            .then((res) => {
-                setNotifications(res);
-            }).
-            catch((err) => setNotifications([]))
-        })()
-    }, [isNotifiOpen])
+    const {
+        notifications, 
+        error: notificationError, 
+        loading: notificationLoading, 
+        refresh: notificationsRefresh
+    } = useNotifications();
 
-    // debounce logic for search bar
-    useEffect(() => {
-        if(mode === "direct" || mode === "group") {
-            const handler = setTimeout(() => {
-                setDebouncedQuery(query);
-            }, 1000);
-            return () => clearTimeout(handler);
-        }
-    }, [query]);
-
-    // Now the function which you want execute
-    useEffect(() => {
-        if((mode === "direct" || mode === "group")) {
-            setLoading(true);
-            (async() => {                
-                const users = await searchUser(debouncedQuery);
-                setUsers(users);
-                setLoading(false);
-            })()
-        }
-    }, [debouncedQuery]);
-
-    const handleMouseDown = () => {
-        longPressTriggered.current = false;
-        timerRef.current = setTimeout(() => {
-            setAlert(prev => !prev);
-            longPressTriggered.current = true;
-        }, 1000);
-    }
-    const handleMouseUp = () => {
-        clearTimeout(timerRef.current);
-    }
-    const handleClick = async() => {
-        if(longPressTriggered.current) {
-            // logic
-            return;
-        }
-        setIsNotifiOpen(prev => true);
-        await readNotification();
-    }
-
-    const logoutHandler = () => {
-        logoutUser()
-        .then(() => {
-            emitOfflineEvent(socket, { userId: userData?._id, conversationIds: conversations.map(c => c.convoId) });     // emit offline event when user logs out
-            dispatch(logout());       // clear Redux slice first
-            socket.disconnect();      // then disconnect socket
-            navigate("/");            // finally navigate
-        })
-        .catch((err) => {
-            console.error("Logout failed:", err);
-            // still clear state locally so UI resets
-            dispatch(logout());
-            socket.disconnect();
-            navigate("/");
-        });
-    };
+    // TODO:
+    // fetch all conversation's last message and store in the redux store, and only load messages
+    // of a conversation when there are no conversations in redux store, meaning, if you want to laod then load only once.
 
     return (
         <div className="h-screen flex relative">
@@ -275,60 +72,34 @@ const Home = () => {
                 {/* Notification */}
                 <Notification errorMessage={error} />
 
-                <div className="min-w-full relative flex flex-col items-center mask-[radial-gradient(circle,white_95%,transparent_100%)] mask-no-repeat mask-center mask-cover rounded-3xl">
-                    {/* React-Bite Component */}
-                    <Silk
-                        speed={2.9}
-                        scale={1.2}
-                        color="#de829a"
-                        noiseIntensity={2}
-                        rotation={1.21}
-                    />
+                {/* Dashboard */}
+                <Dashboard setIsNotifiOpen={setIsNotifiOpen} setQuery={setQuery} setError={setError} />
 
-                    {/* This is DashBoard */}
-                    <div className="px-2 absolute top-2 flex justify-between items-end w-full text-[#e5e5e5]">            
-                        <div className="rounded-2xl p-2 flex flex-col items-start backdrop-blur-[5px] backdrop-saturate-125 bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.125)]">
-                            <span className="font-medium tracking-tight">Good evening,</span>
-                            <span className="font-medium text-xl tracking-tight">{userData && userData.username}</span>
-                        </div>
-                        <div className="rounded-2xl p-2 flex items-center gap-x-2 backdrop-blur-[5px] backdrop-saturate-125 bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.125)]">
-                            <button className="w-8" onClick={logoutHandler}><img className="active:bg-white/20 rounded-full p-1 transition duration-75" src="/assets/icons/exit.png" /></button>
-                            <div className="w-8"><img onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchStart={handleMouseDown} onTouchEnd={handleMouseUp} onClick={handleClick} className="active:bg-white/20 rounded-full p-1 transition duration-75" src={`/assets/icons/${alert ? "ring" : "silent"}.png`} /></div>
-                            <div className="w-8"><img className="active:bg-white/20 rounded-full p-1 transition duration-75" src="/assets/icons/dots.png" /></div>
-                        </div>
-                    </div>
-                    
-                    {/* Search Bar */}
-                    <div className="absolute bottom-2 w-full px-2">
-                        <input onChange={(e) => setQuery(e.target.value)} className="text-[#e5e5e5] backdrop-blur-[5px] backdrop-saturate-125 bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.125)] p-4 rounded-3xl w-full px-4 py-2 text-md focus:outline-none" type="text" placeholder={`${mode ? "Search username" : "Search chat"}`} />
-                    </div>
-                </div>
-                
                 {/* Chat Snippet List */}
                 <div className="h-full scrollbar-hide relative overflow-auto overflow-x-hidden rounded-xl p-4 bg-[#fc94af] shadow-[inset_6px_6px_5px_#de829a,inset_-6px_-6px_5px_#ffa6c4]">
                     {/* creating new conversation doorway */}
-                    {mode && <Outlet context={{ mode: mode, users: users, loading: loading }}/>}
+                    {mode && <Outlet context={{ convoType: mode, searchQuery: query, setError: setError }}/>}
         
                     {(!mode && userData) && (
                         <div className="cursor-pointer flex flex-col gap-y-3 w-full">
-                            {conversations.map((convo) => {
+                            {conversations?.map((convo) => {
+                            
                             let recipientName;
-
                             if (convo.convoType === "direct") {
                                 const recipient = convo.members.find(
-                                (member) => member._id.toString() !== userData?._id
+                                    (member) => member._id.toString() !== userData?._id
                                 );
                                 recipientName = recipient?.username;
                             }
 
                             return (
                                 <Chatsnippet
-                                key={convo.convoId}
-                                conversationData={chatSnippetData[convo.convoId]}
-                                conversationId={convo.convoId}
-                                recipientName={recipientName}
-                                />
-                            );
+                                        key={convo.convoId}
+                                        conversationData={chatSnippetData[convo.convoId]}
+                                        conversationId={convo.convoId}
+                                        recipientName={recipientName}
+                                    />
+                                );
                             })}
                         </div>
                     )}
@@ -377,33 +148,17 @@ const Home = () => {
                 </div>
 
                 {/* notification pane */}
-                <div id="notification pane" className={`${isNotifiOpen ? "translate-x-0" : "-translate-x-full"} z-2 absolute left-0 top-0 p-3 flex flex-col gap-y-5 ease-in-out max-md:bottom-0 overflow-hidden md:left-0 md:top-0 transition-all duration-500 bg-[#fc94Af] h-full w-full max-w-screen`}>
-                    <div className="flex items-center justify-center">
-                        <p className="font-sans text-center text-2xl font-medium w-full">Notification</p>
-                        <button onClick={() => setIsNotifiOpen(prev => false)} className="absolute right-3 top-3 w-9"><img src="/assets/icons/cross_black.png" alt="cross" /></button>
-                    </div>
-                    
-                    {/* notifications area */}
-                    <div className="flex flex-col gap-y-2 h-full w-full py-5 px-4 rounded-3xl shadow-[inset_6px_6px_5px_#de829a,inset_-6px_-6px_5px_#ffa6c4]">
-                        {notifications?.map((notifi) => {
-                                if(notifi.type === "request") return <NotificationSnippet key={notifi._id} notificationContent={notifi} requestNotification={true} />
-                                if(notifi.type === "message") return <NotificationSnippet key={notifi._id} notificationContent={notifi}  messageNotification={true} />
-                                if(notifi.type === "reminder") return <NotificationSnippet key={notifi._id} notificationContent={notifi} reminderNotification={true} />
-                                if(notifi.type === "status") return <NotificationSnippet key={notifi._id} notificationContent={notifi} statusNotification={true} />
-                                if(notifi.type === "receipt") return <NotificationSnippet key={notifi._id} notificationContent={notifi} receiptNotication={true} />
-                                if(notifi.type === "system") return <NotificationSnippet key={notifi._id} notificationContent={notifi} systemNotification={true} />
-                                if(notifi.type === "call") return <NotificationSnippet key={notifi._id} notificationContent={notifi} callNotifcation={true} />
-                                if(notifi.type === "security") return <NotificationSnippet key={notifi._id} notificationContent={notifi} securityNotification={true} />
-                                if(notifi.type === "general") return <NotificationSnippet key={notifi._id} notificationContent={notifi} generalNotification={true} />
-                            })
-                        }
-                    </div>
-                </div>
+                <NotificationPane 
+                    isNotifiOpen={isNotifiOpen}  
+                    setIsNotifiOpen={setIsNotifiOpen}
+                    notifications={notifications}
+                />
+
             </div>
 
             {/* message pane */}
             {(isConversationOpen || screenWidth >= 768) &&
-                <div id="right pane" className="overflow-hidden scrollbar-hide absolute max-md:h-screen max-md:w-screen md:relative md:block md:w-[70%] md:shadow-[inset_6px_6px_5px_#de829a,inset_-6px_-6px_5px_#ffa6c4] md:m-3 rounded-3xl bg-[#fc94Af]">
+                <div id="right pane" className="overflow-hidden scrollbar-hide absolute max-md:h-screen max-md:w-screen md:relative md:block md:w-[70%] md:shadow-[inset_6px_6px_5px_#de829a,inset_-6px_-6px_5px_#ffa6c4] md:m-3 rounded-3xl bg-[#fc94Af] z-20">
                 
                     {/* Message when no conversation is opened */}
                     {
@@ -426,7 +181,7 @@ const Home = () => {
                     {/* Chats */}
                     <div className="h-full w-full">
                         {/* this for the chat sub page with the existing conversations */}
-                        {id && <Outlet context={conversations.find((convo) => { if(id === convo.convoId) return convo })}/>}
+                        {id && <Outlet context={conversations?.find((convo) => id === convo?.convoId)}/>}
                     </div>
                 
                 </div>

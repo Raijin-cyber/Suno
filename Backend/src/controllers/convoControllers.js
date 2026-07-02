@@ -3,7 +3,7 @@ import User from "../models/userModel.js";
 import Request from "../models/requestModel.js";
 import UserConversation from "../models/userConversationModel.js";
 import { v4 as uuidv4 } from "uuid";
-import asyncHandler from "../utilities/asyncHandler.js"
+import asyncHandler from "../utilities/asyncHandler.js";
 
 //@desc creates a new conversation
 //@route " POST /api/v1/convo/create"
@@ -71,7 +71,8 @@ const createConvo = asyncHandler(async(req, res, next) => {
 
         await UserConversation.insertMany(userConvos, { ordered: false });
 
-        res.status(200).json({
+        res.status(200);
+        res.json({
             success: true,
             message: "Conversation created or retrieved successfully",
             conversation: convo
@@ -91,7 +92,7 @@ const createConvo = asyncHandler(async(req, res, next) => {
                 members: participants_ID,
                 admin: userA_ID
             }
-        )
+        );
 
         const userConvos = participants_ID.map(uid => ({
             userId: uid,
@@ -109,13 +110,13 @@ const createConvo = asyncHandler(async(req, res, next) => {
             success: true,
             message: "Successfully created a group",
             result: convo,
-        })
+        });
     }
     else {
         res.status(400);
         throw new Error("conversation type is required. Please specify 'direct' or 'group'.");
     }
-})
+});
 
 //@desc get all user's conversation
 //@route " POST /api/v1/convo/get"
@@ -129,13 +130,24 @@ const getAllConvo = asyncHandler(async(req, res, next) => {
     }
 
     const conversations = await Convo.find(
-        { members: userA_ID }, 
-        { convoType: 1, convoId: 1 }
+        { members: userA_ID },
+        {
+            convoType: 1,
+            convoId: 1,
+            members: 1,
+            lastMessage: 1,
+            unreadCount: 1,
+            avatar: 1
+        }
     )
     .populate({
         path: "members",
         select: "username avatar"
-    });
+    })
+    .populate({
+        path: "lastMessage",
+        select: "encryptedText readByAt createdAt senderId"
+    }).sort({ updatedAt: -1 });
 
     if(!conversations) {
         res.status(404);
@@ -150,7 +162,7 @@ const getAllConvo = asyncHandler(async(req, res, next) => {
         }
     );
 
-})
+});
 
 //@desc updates an existing conversation
 //@route " POST /api/v1/convo/update"
@@ -203,7 +215,7 @@ const updateConvo = asyncHandler(async (req, res, next) => {
             admin: updatedConvo.admin
         }
     });
-})      
+});      
 
 //@desc deletes a conversation
 //@route " POST /api/v1/convo/delete"
@@ -237,11 +249,11 @@ const deleteConvo = asyncHandler(async (req, res, next) => {
         success: true,
         message: "Conversation deleted successfully."
     });
-})
+});
 
 export {
     createConvo,
     getAllConvo,
     updateConvo,
     deleteConvo
-}
+};

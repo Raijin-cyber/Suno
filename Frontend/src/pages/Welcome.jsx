@@ -42,7 +42,7 @@ const Welcome = () => {
     const navigate = useNavigate();
     useEffect(() => {
         status && navigate("/home");
-    }, [])
+    }, [status, navigate])
 
     return (
         <div className="h-full w-full flex flex-col justify-center items-center">

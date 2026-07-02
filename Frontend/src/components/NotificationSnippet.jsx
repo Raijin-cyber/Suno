@@ -1,20 +1,21 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { createConversation } from "../services/conversationServices";
-import { acceptRequest, deleteRequest } from "../services/requestServices"
+import { acceptRequest, deleteRequest } from "../services/requestServices";
+import { useSelector } from "react-redux";
 
 const NotificationSnippet = ({notificationContent, requestNotification}) => { 
     const [requestStatus, setRequestStatus] = useState(notificationContent.requestID.status === "accepted");
+    const userData = useSelector((state) => state.auth.userData);
 
-    const acceptRequestHandler = async() => {
-        // @params:  request id and user id
-        acceptRequest(notificationContent.requestID)
-        .then(async(request) => {await createConversation("direct", notificationContent.sender._id)});
+    const acceptRequestHandler = useCallback(async() => {
+        acceptRequest(notificationContent?.requestID)
+        .then(async(request) => {await createConversation("direct", notificationContent?.sender._id)});
         setRequestStatus(true);
-    }
+    }, [notificationContent]);
 
-    const deleteRequestHandler = () => {
-        
-    }
+    const deleteRequestHandler = useCallback(async() => {
+        await deleteRequest(notificationContent?.requestID, userData?._id);
+    }, [notificationContent, userData])
 
     return (
         <div className="w-full">
@@ -24,9 +25,9 @@ const NotificationSnippet = ({notificationContent, requestNotification}) => {
 
                     <div className="flex items-center gap-x-3 w-full">
                         <div className="w-12 h-auto">
-                            <img src={notificationContent.sender.avatar ? "" : "/assets/icons/user.png"} />    
+                            <img src={notificationContent?.sender.avatar || "/assets/icons/user.png"} />    
                         </div>
-                        <p className="grow w-[50%] md:w-[60%] text-[0.9rem]">{`${notificationContent.sender.username} wants to connect with you.`}</p>
+                        <p className="grow w-[50%] md:w-[60%] text-[0.9rem]">{`${notificationContent?.sender.username} wants to connect with you.`}</p>
                     </div>
 
                     <div className="flex items-center justify-end gap-x-1 w-[35%]">

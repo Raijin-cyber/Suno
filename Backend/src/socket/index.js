@@ -14,12 +14,12 @@ const configSocket = (io) => {
         (() => {
             socket.on("disconnect", (reason) => {
                 console.log(`Client ${socket.id} disconnected: ${reason}`);
-            })
+            });
             
             socket.on("reconnect_attempt", (attempt) => {
                 console.log("Reconnection attempt:", attempt);
             });
-        })()
+        })();
         
         // custom middlewares
         validateToken(socket);
@@ -43,8 +43,8 @@ const configSocket = (io) => {
 
         // read receipt related events
         listenForMarkAsReadEvent(io, socket);
-    })
-}
+    });
+};
 
 export default configSocket;
 

@@ -4,7 +4,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
-import asyncHandler from "../utilities/asyncHandler.js"
+import asyncHandler from "../utilities/asyncHandler.js";
 
 // *** throw new Error(message) *** this line will immediately reject the ongoing promise and the error will be forwarded to the our errorHandler middleware
 
@@ -12,7 +12,7 @@ import asyncHandler from "../utilities/asyncHandler.js"
 //@route " POST /api/v1/auth/register"
 //@access public
 const registerUser = asyncHandler(async(req, res, next) => {
-    const {username, email, password, publicKey} = req.body
+    const {username, email, password, publicKey} = req.body;
 
     if(!username || !email || !password) {
         res.status(400);
@@ -36,7 +36,7 @@ const registerUser = asyncHandler(async(req, res, next) => {
         email: email,
         password: hashedPassword,
         publicKey: publicKey,
-    })
+    });
 
     res.status(200);
     res.json({
@@ -46,7 +46,7 @@ const registerUser = asyncHandler(async(req, res, next) => {
             email: user.email,
         }
     });
-})
+});
 
 //@desc Login a user
 //@route " POST /api/v1/auth/login"
@@ -89,7 +89,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
             {
                 expiresIn: "7d"
             }
-        )
+        );
         const wsToken = jwt.sign(
             {
                 user: {
@@ -103,7 +103,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
             {
                 expiresIn: "15m"
             }
-        )
+        );
         res.status(200);
         res.cookie("refreshToken", refreshToken,
             {
@@ -112,7 +112,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
                 sameSite: "none",
                 maxAge: 7 * 24 * 60 * 60 * 1000
             }
-        )
+        );
         res.cookie("accessToken", accessToken,
             {
                 httpOnly: true,
@@ -120,7 +120,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
                 sameSite: "none",
                 maxAge: 15 * 60 * 1000
             }
-        )
+        );
         res.cookie("wsToken", wsToken,
             {
                 httpOnly: true,
@@ -128,7 +128,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
                 sameSite: "none",
                 maxAge: 15 * 60 * 1000
             }
-        )
+        );
         res.cookie("userA_ID", user._id,
             {
                 httpOnly: true,
@@ -136,7 +136,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
                 sameSite: "none",
                 maxAge: 365 * 24 * 60 * 60 * 1000
             }
-        )
+        );
         res.json({
             success: true,
             message: "Successfully logged in.",
@@ -144,13 +144,13 @@ const loginUser = asyncHandler(async(req, res, next) => {
                 _id: user._id,
                 username: user.username,
             }
-        })
+        });
     }   
     else {
         res.status(401);
         throw new Error("Invalid email or password.");
     }
-})
+});
 
 //@desc verify if the user is authenticated
 //@route " POST /api/v1/auth/curruser"
@@ -180,7 +180,7 @@ const getCurrentUser = asyncHandler(async(req, res, next) => {
         res.status(401);
         throw new Error("Token missing, invalid or expired.");
     }
-})
+});
 
 //@desc provides a new access token based on refresh token
 //@route " POST /api/v1/auth/refresh"
@@ -207,7 +207,7 @@ const refreshToken = asyncHandler(async(req, res, next) => {
                         sameSite: "none",
                         maxAge: 15 * 60 * 1000
                     }
-                )
+                );
                 res.cookie("wsToken", newWsToken,
                     {
                         httpOnly: true,
@@ -215,7 +215,7 @@ const refreshToken = asyncHandler(async(req, res, next) => {
                         sameSite: "none",
                         maxAge: 15 * 60 * 1000
                     }
-                )
+                );
                 res.json({
                     success: true,
                     message: "Access token generated successfully.",
@@ -227,7 +227,7 @@ const refreshToken = asyncHandler(async(req, res, next) => {
         res.status(401);
         throw new Error("Token missing, invalid or expired.");
     }
-})
+});
 
 //@desc Logout a user
 //@route " POST /api/v1/auth/logout"
@@ -261,14 +261,14 @@ const logoutUser = asyncHandler(async(req, res, next) => {
             sameSite: "none",
         }
     );
-    res.status(200)
-    .json(
+    res.status(200);
+    res.json(
         {
             success: true,
             message: "Logged out successfully"
         }
-    )
-})
+    );
+});
 
 //@desc Update a user
 //@route " POST /api/v1/auth/update"
@@ -299,7 +299,7 @@ const updateUser = asyncHandler(async(req, res, next) => {
             },
         }
     );
-})
+});
 
 //@desc Delete a user
 //@route " POST /api/v1/auth/delete"
@@ -344,13 +344,13 @@ const deleteUser = asyncHandler(async(req, res, next) => {
                         email: deletedUser.email,
                     }
                 }
-            )
+            );
     }
     else{
         res.status(401);
         throw new Error("Unauthorized.");
     }
-})
+});
 
 //@desc Search a user in the DB
 //@route " POST /api/v1/auth/search?query=username"
@@ -377,7 +377,7 @@ const searchUser = asyncHandler(async(req, res, next) => {
         success: true,
         results: results
     });
-})
+});
 
 export {
     registerUser,
@@ -388,4 +388,4 @@ export {
     updateUser,
     deleteUser,
     searchUser
-}
+};

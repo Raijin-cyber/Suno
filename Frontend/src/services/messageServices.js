@@ -44,7 +44,7 @@ const markAsReadMessage = async(messageId, readerId, readTime) => {
         const response = await api.patch(MESSAGE_API.read, { messageId, readerId, readTime }, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error fetching messages from the database", error.message);
+        console.error("Error marking messages as read", error.message);
         return error;
     }
 }

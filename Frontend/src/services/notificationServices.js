@@ -27,9 +27,10 @@ const receiveNotification = async() => {
 const readNotification = async() => {
     try {
         const response = await api.put(NOTIFICATION_API.read, {}, { withCredentials: true });
-        return;
+        return response.data;
     } catch (error) {
-        console.error("Error occured while marking unread messages as read.")
+        console.error("Error occured while marking unread messages as read.", error.message);
+        return error.message;
     }
 }
 
