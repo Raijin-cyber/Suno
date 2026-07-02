@@ -39,7 +39,7 @@ const MessageComposer = ({conversationPane, conversationId, referenceMessage, se
     }, [])
     const sendMessageHandler = useCallback((e) => {
         e.preventDefault();
-        conversationPane.scrollTo({ top: conversationPane.scrollHeight, behavior: "smooth" });
+        conversationPane?.scrollTo({ top: conversationPane.scrollHeight, behavior: "smooth" });
         if(!messageTypingArea.current.value.trim()) return;      
         sendMessage(socket, { 
           conversationId: conversationId, 
