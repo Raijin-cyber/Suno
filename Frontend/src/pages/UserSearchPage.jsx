@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import { searchUser } from "../services/authServices";
-import Chatsnippet from "../components/Chatsnippet/Chatsnippet";
+import Chatsnippet from "../components/ChatSnippet/Chatsnippet";
 import CsShimmerUI from "../components/ChatSnippet/CsShimmerUI";
 import { useSelector } from "react-redux";
 

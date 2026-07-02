@@ -5,7 +5,7 @@ import { useScreenWidth } from "../hooks/useScreenWidth";
 
 import Notification from "../components/Notification";
 import Dashboard from "../components/Dashboard/Dashboard";
-import Chatsnippet from "../components/Chatsnippet/Chatsnippet";
+import Chatsnippet from "../components/ChatSnippet/Chatsnippet";
 import NotificationPane from "../components/NotificationPane/NotificationPane";
 
 import useJoinRooms from "../hooks/useJoinRooms";
