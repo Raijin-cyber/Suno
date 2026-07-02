@@ -1,6 +1,6 @@
 import { updateLastMessage, incrementUnread, updateUnreadMessages } from "../store/conversationsSlice";
 import { storeMessage } from "../services/messageServices";
-import { updateMessage } from "../store/messagesSlice";
+import { updateNewMessage } from "../store/messagesSlice";
 import { SOCKET_EVENTS } from "./socketEvents";
 
 // *** SOCKET METHODS ***
@@ -37,7 +37,7 @@ const sendMessage = (socket, { conversationId, referenceMessageId, message, mess
 const listenForMessages = (socket, dispatch) => {
   socket.on(SOCKET_EVENTS.MESSAGE_RECEIVE, ({ senderId, conversationId, messageId, message, messageCreator, referenceMessage, referenceMessageCreator, time }) => { 
     // update messages slice -> store messages in the store
-    dispatch(updateMessage({
+    dispatch(updateNewMessage({
       convoId: conversationId, 
       messageId: messageId,
       message: message, 

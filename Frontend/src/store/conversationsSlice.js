@@ -10,6 +10,7 @@ const ensureConvo = (state, conversationId) => {
     state.byId[conversationId] = {
       lastMessage: null,
       lastMessageTime: null,
+      cursorId: null,
       typingUsers: [],
       unreadCount: null,
       unreadMessages: []
@@ -43,6 +44,11 @@ const conversationsSlice = createSlice({
       const convo = ensureConvo(state, conversationId);
       convo.lastMessage = message;
       convo.lastMessageTime = time;
+    },
+    updateCursorId: (state, action) => {
+      const { conversationId, cursorId } = action.payload;
+      const convo = ensureConvo(state, conversationId);
+      convo.cursorId = cursorId;
     },
     incrementUnread: (state, action) => {
       const { conversationId } = action.payload;
@@ -79,6 +85,7 @@ export const {
   updateTyping,
   stopTyping,
   updateLastMessage,
+  updateCursorId,
   incrementUnread,
   resetUnread,
   updateUnreadMessages,

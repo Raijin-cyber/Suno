@@ -1,4 +1,4 @@
-const Loader = ({loadingState}) => {
+const Spinner = ({loadingState}) => {
     return (
         <div>
             {loadingState &&
@@ -18,4 +18,4 @@ const Loader = ({loadingState}) => {
     )
 }
 
-export default Loader;
+export default Spinner;

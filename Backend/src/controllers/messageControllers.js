@@ -54,7 +54,7 @@ const createMessage = asyncHandler(async (req, res, next) => {
     });
 });
 
-//@desc get messages
+//@desc get messages: if last message Id is provided-> fetch from that ID otherwise fetch last 20
 //@route " POST /api/v1/message/:id/get"
 //@access private
 const getMessage = asyncHandler(async (req, res) => {

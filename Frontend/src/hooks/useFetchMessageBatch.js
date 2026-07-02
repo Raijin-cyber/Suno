@@ -1,17 +1,55 @@
 import store from "../store/store";
+import { useCallback, useEffect, useState } from "react";
+import { updateOldMessage } from "../store/messagesSlice";
 import { fetchMessage } from "../services/messageServices";
+import { updateCursorId } from "../store/conversationsSlice";
 
-const useFetchMessageBatch = ({ conversationId }) => {
+const useFetchMessageBatch = ({ conversationId, userData, trigger }) => {
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+
+    const updateMessageStore = useCallback(() => {
+        const cursorId = store.getState().conversations?.byId[conversationId]?.cursorId || null;
+        
+        if(!conversationId) {
+            setError({error: "Bad Request", message: "Conversation ID is missing."});
+            return;
+        }
+
+        if(loading) return;
+
+        if(trigger && hasMore) {
+            setLoading(true);
+            fetchMessage(conversationId, 20, cursorId)
+            .then(({ messages }) => {
+                if(!messages?.length) {
+                    setHasMore(false);
+                    return;
+                }
+                store.dispatch(updateOldMessage(
+                    { 
+                        oldMessages: messages, 
+                        userId: userData?._id, 
+                        convoId: conversationId 
+                    }
+                ));
+                store.dispatch(updateCursorId({ conversationId, cursorId: messages[0]._id }));
+            })
+            .catch((error) => setError(error))
+            .finally(() => setLoading(false))
+        }
+    }, [conversationId, trigger]);
     
+    useEffect(() => {
+        if(trigger || conversationId) updateMessageStore()
+    }, [trigger])
+
+    useEffect(() => {
+        setHasMore(true);
+    }, [conversationId])
+
+    return { error, loading, hasMore };
 }
 
 export default useFetchMessageBatch;
-
-/*  This hook is supposed to fetch messages in batches( 10-20 messages in when called once )
-                                        +
-    Keep track of messages so that you know from which endpoint you have to fetch the messages
-                                        +
-    This hook will fetch and populate the REDUX STORE of messages of the provided  "CONVERSATION ID"
-                                        +
-    When opening first time a conversation, fetch the message after checking that the message does not exist for that CONVERSATION ID in the STORE 
-*/

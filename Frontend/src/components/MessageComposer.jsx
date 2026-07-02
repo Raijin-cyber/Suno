@@ -7,7 +7,7 @@ import { emitTypingEvent, emitNotTypingEvent } from "../socket/typing";
 // Lazy components
 const EmojiPicker = lazy(() => import("./EmojiPicker/EmojiPicker"));
 
-const MessageComposer = ({conversationId, referenceMessage, setReferenceMessage}) => {
+const MessageComposer = ({conversationPane, conversationId, referenceMessage, setReferenceMessage}) => {
     const socket = useSocket()
     const typingTimeout = useRef()
     const messageTypingArea = useRef(null)
@@ -39,6 +39,7 @@ const MessageComposer = ({conversationId, referenceMessage, setReferenceMessage}
     }, [])
     const sendMessageHandler = useCallback((e) => {
         e.preventDefault();
+        conversationPane.scrollTo({ top: conversationPane.scrollHeight, behavior: "smooth" });
         if(!messageTypingArea.current.value.trim()) return;      
         sendMessage(socket, { 
           conversationId: conversationId, 
@@ -49,7 +50,7 @@ const MessageComposer = ({conversationId, referenceMessage, setReferenceMessage}
         });
         messageTypingArea.current.value = '';
         setReferenceMessage(null);
-    }, [messageTypingArea])
+    }, [messageTypingArea, conversationId])
     return(
         <>
             {/* Emoji Picker */}
