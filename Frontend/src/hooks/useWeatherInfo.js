@@ -8,7 +8,7 @@ const useWeatherInfo = () => {
     const [error, setError] = useState(null);
 
     const fetchWeatherData = useCallback(() => {
-        const reqUrl = `http://api.weatherapi.com/v1/current.json?key=${import.meta.env.VITE_WEATHER_API_KEY}` + `&q=${latitude},${longitude}` + "&aqi=yes"
+        const reqUrl = `https://api.weatherapi.com/v1/current.json?key=${import.meta.env.VITE_WEATHER_API_KEY}` + `&q=${latitude},${longitude}` + "&aqi=yes"
         fetch(reqUrl)
         .then(response => {
             if(!response.ok) {
