@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { sendMessage } from "../socket/chat";
 import { useSocket } from "../hooks/useSocket";
-import { useState, useCallback, useRef, lazy, Suspense } from "react";
+import { useState, useCallback, useRef, lazy, Suspense, useEffect } from "react";
 import { emitTypingEvent, emitNotTypingEvent } from "../socket/typing";
 
 // Lazy components
@@ -50,7 +50,7 @@ const MessageComposer = ({conversationPane, conversationId, referenceMessage, se
         });
         messageTypingArea.current.value = '';
         setReferenceMessage(null);
-    }, [messageTypingArea, conversationId])
+    }, [messageTypingArea, conversationId, referenceMessage])
     return(
         <>
             {/* Emoji Picker */}

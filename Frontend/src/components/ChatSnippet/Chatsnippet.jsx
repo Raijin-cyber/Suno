@@ -8,6 +8,8 @@ const Chatsnippet = ({ userData=null, recipientID=null, recipientAvatar=null, re
     const navigate = useNavigate();
     const [ requestBtnState, setRequestBtnState] = useState(false);
 
+    const regex = /(\/emojis library\/([^/]+)\/([A-Za-z0-9-]+)_u([a-f0-9_]+)\.json)&([\p{Emoji}\u200d\ufe0f]+)/giu;
+
     // This function takes the user to conversation page
     const roomHandler = useCallback(() => {
         if(!conversationId) return;
@@ -24,6 +26,14 @@ const Chatsnippet = ({ userData=null, recipientID=null, recipientAvatar=null, re
         .catch((error) => setError(error))
     }, [userData]);
 
+    const extractLastEmoji = (text) => {
+        const graphemes = [...new Intl.Segmenter("en", {
+            granularity: "grapheme",
+        }).segment(text)];
+
+        return graphemes.at(-1)?.segment ?? "";
+    };
+
     return(
         <div onClick={roomHandler} className={`backdrop-blur-[1.5px] bg-[rgba(255,255,255,0.3)] border border-[rgba(255,255,255,0.1)] flex items-center justify-between w-full p-2 rounded-2xl transition duration-100 ${conversationId && "hover:bg-black/20 active:bg-black/20"}`}>
             <div className="flex items-center gap-3 w-[85%]">
@@ -35,12 +45,15 @@ const Chatsnippet = ({ userData=null, recipientID=null, recipientAvatar=null, re
                 {/* Main Content */}
                 <div className="flex flex-col flex-1 items-start min-w-0">
                     <p className="font-semibold">{recipientName}</p>
-                    { 
-                        conversationId &&
-                        <p className="text-[0.85rem] line-clamp-1 break-all">
-                            {conversationData?.lastMessage || <i>No messages to show</i>}
-                        </p>
-                    }
+                    {conversationData?.lastMessage
+    ? (
+        <>
+                        {regex.test(conversationData.lastMessage)
+                            ? extractLastEmoji(conversationData.lastMessage)
+                            : conversationData.lastMessage}
+                        </>
+                    )
+                    : <i>No messages to show</i>}
                 </div>
             </div>
 

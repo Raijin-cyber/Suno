@@ -35,13 +35,13 @@ const messagesSlice = createSlice({
         updateOldMessage: (state, action) => {
             const { oldMessages, userId, convoId } = action.payload;
             const normalizedBatch = oldMessages.map(msg => ({
-                messageId: msg._id,
-                message: msg.text || msg.encryptedText,
-                messageCreator: msg.senderId?._id || msg.senderId,
-                referenceMessage: msg.referenceMessage || null,
-                referenceMessageCreator: msg.referenceMessageCreator || null,
-                isOwn: userId === msg.senderId?._id,
-                time: formatTime(msg.createdAt), 
+                messageId: msg?._id,
+                message: msg?.encryptedText,
+                messageCreator: msg?.senderId?.username || null,
+                referenceMessage: msg?.referenceMessage?.encryptedText || null,
+                referenceMessageCreator: msg?.senderId?.username || null,
+                isOwn: userId === msg?.senderId?._id,
+                time: formatTime(msg?.createdAt), 
                 readByAt: msg.readByAt
             }));
             if(!state.byConversationId[convoId]){

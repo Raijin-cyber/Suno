@@ -5,7 +5,7 @@ const useEmojiManifest = () => {
     const [errors, setErrors] = useState(null);
 
     useEffect(() => {
-        fetch("../../public/emojis library/manifest.json")
+        fetch("/public/emojis library/manifest.json")
         .then(
             r => 
                 r.json()
