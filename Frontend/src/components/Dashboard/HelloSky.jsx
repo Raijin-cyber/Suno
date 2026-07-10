@@ -2,7 +2,7 @@ import greetUser from "../../utils/greetUser";
 import useWeatherInfo from "../../hooks/useWeatherInfo";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const HelloSky = ({userData=null}) => {
+const HelloSky = ({ userData=null }) => {
     const ref = useRef();
     const [greet, setGreet] = useState(greetUser());
     const [helloSkyState, setHelloSkyState] = useState(false);
@@ -18,11 +18,9 @@ const HelloSky = ({userData=null}) => {
     }, [])
 
     useEffect(() => {
-        const updateGreeting = () => setGreet(greetUser());
-        updateGreeting();
         const interval = setInterval(
-            updateGreeting,
-            60000 // every minute
+            setGreet(greetUser()),
+            60000 
         );
         return () => clearInterval(interval);
     }, []);
@@ -47,8 +45,8 @@ const HelloSky = ({userData=null}) => {
             {/* upper block */}
             <div className="flex items-start justify-between">
                 <div className="flex flex-col items-start">
-                    <span key={greet} className="block w-full truncate text-[1rem] font-normal tracking-tighter animate-fade-in-up">{greet}</span>
-                    <span key={userData?.username} className="block w-full truncate font-medium text-[1.5rem] tracking-tighter animate-fade-in-up">{userData?.username}</span>
+                    <span className="block w-full truncate text-[1rem] font-normal tracking-tighter animate-fade-in-up">{greet}</span>
+                    <span className="block w-full truncate font-medium text-[1.5rem] tracking-tighter animate-fade-in-up">{userData?.username}</span>
                 </div>
                 <button className={`${helloSkyState ? "animate-fade-in-up" : "hidden"} animate-duration-400 hover:bg-white/20 active:bg-white/20 rounded-full p-1 transition duration-150`} ><img className="w-5" src="/assets/icons/cross.png" alt="cross" /></button>
             </div>

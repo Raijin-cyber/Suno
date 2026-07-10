@@ -40,7 +40,17 @@ const conversationsSlice = createSlice({
       }
     },
     updateLastMessage: (state, action) => {
-      const { conversationId, message, time } = action.payload;
+      const { conversationId, message, time, lastMessages } = action.payload;
+      
+      if(lastMessages && Array.isArray(lastMessages)) {
+        lastMessages.forEach(cnvs => {
+          const convo = ensureConvo(state, cnvs?.conversationId);
+          convo.lastMessage = cnvs.message;
+          convo.lastMessageTime = cnvs.time;
+        })
+        return;
+      }
+      
       const convo = ensureConvo(state, conversationId);
       convo.lastMessage = message;
       convo.lastMessageTime = time;

@@ -22,7 +22,7 @@ const Home = () => {
     const [addButtonState, setAddButtonState] = useState(false);
     
     // Fetching from the Redux Store
-    const userData = useSelector(state => state.auth.userData);
+    const userData = useSelector(state => state.auth?.userData);
     const chatSnippetData = useSelector(state => state.conversations.byId) || {};
     
     // Notification state
@@ -60,10 +60,6 @@ const Home = () => {
         refresh: notificationsRefresh
     } = useNotifications();
 
-    // TODO:
-    // fetch all conversation's last message and store in the redux store, and only load messages
-    // of a conversation when there are no conversations in redux store, meaning, if you want to laod then load only once.
-
     return (
         <div className="h-screen flex relative">
             {/* Conversations pane */}
@@ -73,7 +69,7 @@ const Home = () => {
                 <Notification errorMessage={error} />
 
                 {/* Dashboard */}
-                <Dashboard setIsNotifiOpen={setIsNotifiOpen} setQuery={setQuery} setError={setError} />
+                <Dashboard userData={userData} setIsNotifiOpen={setIsNotifiOpen} setQuery={setQuery} setError={setError} />
 
                 {/* Chat Snippet List */}
                 <div className="h-full scrollbar-hide relative overflow-auto overflow-x-hidden rounded-xl p-4 bg-[#fc94af] shadow-[inset_6px_6px_5px_#de829a,inset_-6px_-6px_5px_#ffa6c4]">

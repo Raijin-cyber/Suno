@@ -14,15 +14,16 @@ import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 const Conversation = () => {
     const navigate = useNavigate();
     const previousHeight = useRef(0);
-    const topTriggerRef = useRef(null);
     const { id: roomId } = useParams();
+    const topTriggerRef = useRef(null);
+    const messageListRef = useRef(null);
     const initialLoaded = useRef(false);
     const conversationPane = useRef(null);
     const [closing, setClosing] = useState(false);
     const conversationContext = useOutletContext();
     const [scrlBtnState, setScrlBtnState] = useState(false);
     const [referenceMessage, setReferenceMessage] = useState(null);
-    
+
     const userData = useSelector(
       (state) => state.auth.userData
     ) || {};
@@ -153,11 +154,6 @@ const Conversation = () => {
       setClosing(true);
       setTimeout(() => navigate("/home"), 200);
     }, [])
-
-    const handleScrollToBottom = useCallback(() => {
-      conversationPane.current
-      .scrollTo({ top: conversationPane.current.scrollHeight, behavior: "smooth"})
-    }, [])
   return (
     <>
       {/* Conversation */}
@@ -177,26 +173,29 @@ const Conversation = () => {
         <div ref={topTriggerRef} className="h-px"/>
 
         {/* First Message */}
-        <div className="relative flex flex-col justify-center items-center">
-          <img className="sm:w-90 md:w-100 lg:w-140" src="/assets/illustrations/Political debate-rafiki.png" alt="first-message" />
-          <p className="absolute -bottom-5 md:bottom-2 text-center font-light text-xl">Got something to say? Type it below!</p>
-        </div>
+        {conversationMessages.length === 0 &&
+          <div className="relative flex flex-col justify-center items-center">
+            <img className="sm:w-90 md:w-100 lg:w-140" src="/assets/illustrations/Political debate-rafiki.png" alt="first-message" />
+            <p className="absolute -bottom-5 md:bottom-2 text-center font-light text-xl">Got something to say? Type it below!</p>
+          </div>
+        }
 
         {/* ####### Chats ####### */}
         <div id="chat-area" className="relative w-full mt-12 flex-1 px-2">
-          {/* Actual conversations */}
           <div className={`flex flex-col gap-y-2 transition-all duration-300 ${typingMembers?.length > 0 ? "-translate-y-10" : "translate-y-0"}`}>
             {
-              !hasMore && <p className="text-center text-xs font-light tracking-wider">No more messages</p> 
+              !hasMore && <p className="absolute left-1/2 -translate-x-1/2 -top-5 text-xs font-light tracking-wider">No more messages</p> 
             }
             {
               loadingFetch ? 
               <MirageCustom /> :
-              <MessageList 
+              <MessageList
+                messageListRef={messageListRef}
                 conversationMessages={conversationMessages}
-                referenceMessage={referenceMessage}
                 setReferenceMessage={setReferenceMessage}
                 conversationContext={conversationContext}
+                conversationPane={conversationPane}
+                referenceMessage={referenceMessage}
                 participant={participant}
               />
             }
@@ -219,7 +218,7 @@ const Conversation = () => {
       {scrlBtnState &&
         // Scroll to bottom
         <div
-          onClick={handleScrollToBottom} 
+          onClick={() => messageListRef.current?.scrollToEnd({ behavior: "instant" })}
           className="fixed bottom-35 right-9 z-50
                         w-12 h-12 flex items-center justify-center
                         bg-white/60 shadow-lg rounded-full

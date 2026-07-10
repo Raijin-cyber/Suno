@@ -4,22 +4,23 @@ import Ellipsis from "../Ellipsis/Ellipsis";
 import greetUser from "../../utils/greetUser";
 import { resetStore } from "../../store/storeFn";
 import { useSocket } from "../../hooks/useSocket";
-import Silk from "../../React-Bites Components/Silk";
 import { logoutUser } from "../../services/authServices";
 import { useNavigate, useParams } from "react-router-dom";
 import { readNotification } from "../../services/notificationServices";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-const Dashboard = ({ setIsNotifiOpen, setQuery, setError }) => {
-    const timerRef = useRef();
+const Silk = lazy(() => import("../../React-Bites Components/Silk"));
+
+const Dashboard = ({ userData=null, setIsNotifiOpen, setQuery, setError }) => {
     const socket = useSocket();
     const { mode } = useParams();
+    const timerRef = useRef(null);
     const navigate = useNavigate();
-    const ellipsisBtnRef = useRef();
-    const longPressTriggered = useRef();
+    const ellipsisBtnRef = useRef(null);
+    const longPressTriggered = useRef(null);
     const [alert, setAlert] = useState(true);
+    const [isDynamicAnim, SetIsDynamicAnim] = useState(false);
     const [ellipsisState, setEllipsisState] = useState(false);
-    const userData = useSelector((state) => state.auth.userData);
     
     const handleMouseDown = useCallback(() => {
         longPressTriggered.current = false;
@@ -66,13 +67,23 @@ const Dashboard = ({ setIsNotifiOpen, setQuery, setError }) => {
                     mask-[radial-gradient(circle,white_95%,transparent_100%)] 
                 "
             >
-                <Silk
-                    speed={2.9}
-                    scale={1.2}
-                    color="#de829a"
-                    noiseIntensity={2}
-                    rotation={1.21}
-                />
+                {isDynamicAnim ?
+                    <Suspense fallback={null}>
+                        <Silk
+                            speed={2.9}
+                            scale={1.2}
+                            color="#de829a"
+                            noiseIntensity={2}
+                            rotation={1.21}
+                        />
+                    </ Suspense>
+                    :
+                    <img 
+                        className="h-38 w-full min-w-md saturate-85" 
+                        src="/backgrounds/silk_background.webp" 
+                        alt="silk_background" 
+                    />
+                }
             </div>
             
 
