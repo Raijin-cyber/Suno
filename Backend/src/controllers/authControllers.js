@@ -198,7 +198,7 @@ const googleAuthStart = asyncHandler(async(req, res, next) => {
 
     if(!url) throw new Error("Error getting an authorization URL.");
 
-    res.redirect(url);    
+    res.redirect(url.href);    
 })
 
 // Initiates the OAuth flow for google
@@ -294,7 +294,7 @@ const githubAuthStart = asyncHandler(async(req, res, next) => {
         ["read:user", "user:email"]
     );
 
-    res.redirect(url);
+    res.redirect(url.href);
 })
 
 //@desc Authenticates a user with one click
