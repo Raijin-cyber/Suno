@@ -1,4 +1,15 @@
 // App.jsx
+import { 
+  Auth, 
+  Welcome, 
+  About, 
+  Home, 
+  UserSearchPage, 
+  ErrorPage,
+  Credits, 
+  Explore
+} from "./pages/pageImports";
+
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { useEffect } from "react";
 import { resetStore } from "./store/storeFn";
@@ -6,7 +17,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { login } from "./store/authSlice";
 import { getCurrentUser } from "./services/authServices";
 import Conversation from "./pages/Conversation";
-import { Auth, Welcome, About, Home, UserSearchPage, ErrorPage } from "./pages/pageImports";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoadingScreen from "./components/Loaders/LoadingScreen";
 import errorHandler from "./utils/errorHandler";
@@ -16,6 +26,8 @@ const appRoutes = createBrowserRouter([
   { path: "/", element: <Welcome /> },
   { path: "/auth", element: <Auth /> },
   { path: "/about", element: <About /> },
+  { path: "/explore", element: <Explore /> },
+  { path: "/credit", element: <Credits /> },
   {
     path: "/home",
     element: (
@@ -64,7 +76,7 @@ function App() {
         console.error("Error verifying session:", err);
         resetStore();
       });
-  }, [userData, dispatch, socket]);
+  }, []);
 
   return <RouterProvider router={appRoutes} onError={errorHandler} />;
 }

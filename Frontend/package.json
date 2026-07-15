@@ -1,7 +1,7 @@
 {
   "name": "suno-frontend",
   "private": true,
-  "version": "1.0.8",
+  "version": "1.0.9",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -27,7 +27,8 @@
     "socket.io-client": "^4.8.3",
     "tailwind-animations": "^1.0.1",
     "tailwindcss": "^4.2.4",
-    "three": "^0.184.0"
+    "three": "^0.184.0",
+    "typewriter-effect": "^2.22.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

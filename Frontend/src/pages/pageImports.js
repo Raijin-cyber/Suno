@@ -4,6 +4,8 @@ import About from "./About";
 import Home from "./Home";
 import UserSearchPage from "./UserSearchPage";
 import ErrorPage from "./ErrorPage";
+import Credits from "./Credits"
+import Explore from "./Explore"
 
 export {
     Auth,
@@ -12,4 +14,6 @@ export {
     Home,
     UserSearchPage,
     ErrorPage,
+    Credits,
+    Explore
 }

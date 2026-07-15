@@ -28,7 +28,6 @@ function Emoji({ setEmoji, file, emoji, style, animateState = false, setAnimatio
                 animateState ?
                 (<DotLottieReact
                     src={file}
-                    loopCount={1}
                     autoplay={true}
                     onClick={playAnimation}
                     useFrameInterpolation={false}

@@ -1,6 +1,19 @@
 import express from "express";
 import validateToken from "../middlewares/validateToken.js";
-import { registerUser, loginUser, getCurrentUser, refreshToken, logoutUser, updateUser, deleteUser, searchUser } from "../controllers/authControllers.js";
+import { 
+    registerUser, 
+    loginUser,
+    googleAuthStart,
+    googleAuthCallbackHandler,
+    githubAuthStart, 
+    githubAuthCallbackHandler,
+    getCurrentUser, 
+    refreshToken, 
+    logoutUser, 
+    updateUser, 
+    deleteUser, 
+    searchUser,
+} from "../controllers/authControllers.js";
 
 const authRoutes = express.Router();
 
@@ -10,6 +23,16 @@ authRoutes.route("/register").post(registerUser);
 authRoutes.route("/login").post(loginUser); 
 
 authRoutes.route("/refresh").post(refreshToken); 
+
+// OAuth2 based authentication and authorization
+// OAuth2 and OIDC flow, following server flow, not the implicit flow
+
+// Google
+authRoutes.route("/google").get(googleAuthStart);
+authRoutes.route("/google/callback").get(googleAuthCallbackHandler);
+// Github
+authRoutes.route("/github").get(githubAuthStart);
+authRoutes.route("/github/callback").get(githubAuthCallbackHandler);
 
 // applying a middleware, all request will first go through this middleware
 authRoutes.use(validateToken);

@@ -5,7 +5,6 @@ import cors from "cors";
 import configSocket from "./src/socket/index.js";
 import cookieParser from "cookie-parser";
 import errorHandler from "./src/middlewares/errorHandler.js";
-import { configDotenv } from "dotenv";
 import { Server } from "socket.io";
 import connectDB from "./database/dbConnection.js";
 import Redis from "ioredis";
@@ -17,8 +16,6 @@ import messageRoutes from "./src/routes/messageRoutes.js";
 import requestRoutes from "./src/routes/requestRoutes.js";
 import notificationRoutes from "./src/routes/notificationRoutes.js";
 import userConversationRoutes from "./src/routes/userConversationRoutes.js";
-
-configDotenv(); // loads .env's content in process.env
 
 const PORT = process.env.PORT || 5000;
 
@@ -51,7 +48,7 @@ app.use(errorHandler);
 // start the http server only if the database is ready to connect
 connectDB(5, 10000)
 .then(() => {
-    httpServer.listen(PORT, () => console.log(`Server is listening on http://localhost:${PORT}/api/v1`));
+    httpServer.listen(PORT, () => console.log(`Server is listening on ${process.env.NODE_ENV === "development" ? `http://localhost:${PORT}/api/v1` : `https://orbi-ji1n.onrender.com`}`));
 });
 
 // connect caching server (in this case, caching server is Valkey)

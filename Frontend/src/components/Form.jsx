@@ -1,8 +1,19 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 
-const Form = ({ onSubmitHandler, loadingState, onSendAuthMode, username, email, password }) => {
-    const { register, handleSubmit, watch, formState: { errors } } = useForm({criteriaMode: "all", defaultValues: {username: '', email: '', password: ''}});
+const Form = ({ 
+    onSubmitHandler, 
+    loadingState, 
+    onSendAuthMode, 
+    username, 
+    email, 
+    password,
+    error 
+}) => {
+    const [usernameState, setUsernameState] = useState(null);
+    const { register, handleSubmit, watch, formState: { errors } } = 
+    useForm({criteriaMode: "all", defaultValues: {username: '', email: '', password: ''}});
 
     let isFilled;
     if(username && email && password) {
@@ -22,9 +33,12 @@ const Form = ({ onSubmitHandler, loadingState, onSendAuthMode, username, email, 
             className="flex flex-col gap-y-7 w-2xs"
         >
             
-            <div className="w-full">
-                {username && <input type="text" placeholder="Username"
-                className="w-full bg-transparent focus:bg-transparent focus:outline-none border-b-2" 
+            <div className="relative w-full h-full">
+                {username && 
+                <input 
+                    type="text" 
+                    placeholder="Username"
+                    className="w-full bg-transparent focus:bg-transparent focus:outline-none border-b-2 mt-6" 
                 {...register("username", {
                     required: {
                         value: true,
@@ -37,6 +51,12 @@ const Form = ({ onSubmitHandler, loadingState, onSendAuthMode, username, email, 
                         }
                     }
                 })}/>}
+                {
+                    usernameState &&
+                    <div className="absolute flex items-center justify-center top-1/2 right-0 w-5 h-5 p-1 border-2 border-green-600 rounded-full">
+                        <i className="fa-solid fa-check text-green-600 text-xs"></i>
+                    </div>
+                }
                 <span className="text-red-800 text-xs font-semibold">
                     <ErrorMessage
                         errors={errors}
@@ -90,7 +110,7 @@ const Form = ({ onSubmitHandler, loadingState, onSendAuthMode, username, email, 
                         message: "Minimum 7 characters are required!"
                     },
                     maxLength: {
-                        value: 25,
+                        value: 20,
                         message: "Not more 20 characters are allowed!" 
                     }
                 })}/>}
@@ -106,13 +126,19 @@ const Form = ({ onSubmitHandler, loadingState, onSendAuthMode, username, email, 
                     />
                 </span>
             </div>
-
             
-            
+            {/* prompting user to change page */}
             {username && <p className="text-black/50">Already have an account?<span className="underline hover:text-black active:text-black ml-1 cursor-pointer" onClick={() => onSendAuthMode("login")}>Login</span></p>}
             {!username && <p className="text-black/50">Don't have an account?<span className="underline hover:text-black active:text-black ml-1 cursor-pointer" onClick={() => onSendAuthMode("createAccount")}>Create</span></p>}
-            {!loadingState && <button type="submit" disabled={!isFilled} className={`bg-[#D6336C]/90 shadow-2xl py-2 font-semibold font-sans text-white rounded-xl text-xl transition duration-75 ${!isFilled ? `opacity-75` : `opacity-100 active:scale-97`}`}>{username ? "Create Account" : "Login"}</button>}
-            {loadingState && <button type="submit" disabled={!isFilled} className={`bg-[#D6336C]/90 shadow-2xl py-2 font-semibold font-sans text-white rounded-xl text-xl transition duration-75 ${!isFilled ? `opacity-75` : `opacity-100 active:scale-97`}`}><div className="flex justify-center items-center w-full"><img className="w-7 h-auto animate-spin" src="/assets/icons/Rolling@1x-1.0s-200px-200px.svg" /></div></button>}
+            
+            {/* error */}
+            <span className="text-center text-red-800 text-xs font-semibold">
+                {error}
+            </span>
+            
+            {/* buttons */}
+            {!loadingState && <button type="submit" disabled={!isFilled} className={`cursor-pointer bg-[#D6336C]/90 shadow-2xl h-12 font-semibold font-sans text-white rounded-xl text-xl transition duration-75 ${!isFilled ? `opacity-75` : `opacity-100 active:scale-97`}`}>{username ? "Create Account" : "Login"}</button>}
+            {loadingState && <button type="submit" disabled={!isFilled} className={`cursor-pointer bg-[#D6336C]/90 shadow-2xl h-12 font-semibold font-sans text-white rounded-xl text-xl transition duration-75 ${!isFilled ? `opacity-75` : `opacity-100 active:scale-97`}`}><div className="flex justify-center items-center w-full"><img className="w-7 h-auto animate-spin" src="/assets/icons/Rolling@1x-1.0s-200px-200px.svg" /></div></button>}
         </form>
     )
 }

@@ -1,6 +1,6 @@
 {
   "name": "suno-backend",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "This is the backend service for a chat application called suno.",
   "license": "MIT",
   "author": "Ujjwal Sharma",
@@ -8,8 +8,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
-    "start": "node index.js",
+    "dev": "nodemon --env-file=.env index.js",
+    "start": "node --env-file=.env index.js",
     "lint": "eslint .",
     "lint-fix": "eslint --fix"
   },
@@ -20,6 +20,7 @@
     "nodemon": "^3.1.14"
   },
   "dependencies": {
+    "arctic": "^3.7.0",
     "bcrypt": "^6.0.0",
     "cookie": "^1.1.1",
     "cookie-parser": "^1.4.7",

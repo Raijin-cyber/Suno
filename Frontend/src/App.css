@@ -1,6 +1,23 @@
 @import "tailwindcss";
 @import 'tailwind-animations';
 
+/* Chrome, Safari, Edge */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* Firefox */
+html,
+body {
+    scrollbar-width: none;
+}
+
+/* IE */
+body {
+    -ms-overflow-style: none;
+}
+
 html,
 body,
 #root {
@@ -30,6 +47,11 @@ input:-webkit-autofill:focus {
 
 .animated-gradient-1 {
     background: linear-gradient(210deg, #fc94Af 5%, #f4c2c2 55%);
+    background-size: 230% 230%; animation: animated-gradient-flow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animated-gradient-2 {
+    background: linear-gradient(210deg, #b373e4 5%, #d874b7 55%);
     background-size: 230% 230%; animation: animated-gradient-flow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 

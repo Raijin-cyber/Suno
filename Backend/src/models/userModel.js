@@ -3,6 +3,22 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
     auth: {
         type: String,
+        enum: ["native", "google", "github", "facebook", "apple", "twitter"],
+        required: true,
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true,
+    },
+    githubId: {
+        type: String,
+        unique: true,
+        sparse: true,
+    },
+    avatar: {
+        type: String,
+        default: null,
     },
     username: {
         type: String,
@@ -15,11 +31,16 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, "Password is required!"],
+        required: function () {
+            return this.auth === "native"; // only required for native login
+        },
+    },
+    name: {
+        type: String
     },
     publicKey: {
         type: String,
-        required: true,
+        default: null,
     },
     blockedUser: {
         type: [mongoose.Schema.Types.ObjectId],

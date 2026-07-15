@@ -1,7 +1,7 @@
 import {  useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
-import { useScreenWidth } from "../hooks/useScreenWidth";
+import useScreenWidth from "../hooks/useScreenWidth";
 
 import Notification from "../components/Notification";
 import Dashboard from "../components/Dashboard/Dashboard";
