@@ -1,13 +1,14 @@
 // neccessary modules
-import express from "express";
 import http from "http";
 import cors from "cors";
-import configSocket from "./src/socket/index.js";
-import cookieParser from "cookie-parser";
-import errorHandler from "./src/middlewares/errorHandler.js";
-import { Server } from "socket.io";
-import connectDB from "./database/dbConnection.js";
 import Redis from "ioredis";
+import "./src/config/env.js";
+import express from "express";
+import { Server } from "socket.io";
+import cookieParser from "cookie-parser";
+import configSocket from "./src/socket/index.js";
+import connectDB from "./database/dbConnection.js";
+import errorHandler from "./src/middlewares/errorHandler.js";
 
 // routes
 import authRoutes from "./src/routes/authRoutes.js";
