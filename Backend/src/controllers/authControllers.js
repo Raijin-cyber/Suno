@@ -10,23 +10,28 @@ import generateUniqueUsername from "../utilities/generateUniqueUsername.js";
 
 // *** throw new Error(message) *** this line will immediately reject the ongoing promise and the error will be forwarded to the our errorHandler middleware
 
-// Preparing the rediirect URIs
-const redirectURI = process.env.NODE_ENV === "development" 
+// Preparing the redirect URIs for google
+const googleRedirectURI = process.env.NODE_ENV === "development" 
 ? "http://localhost:5000/api/v1/auth/google/callback" 
 : "https://orbi-ji1n.onrender.com/api/v1/auth/google/callback";
+
+// Preparing the redirect URIs for github
+const githubRedirectURI = process.env.NODE_ENV === "development" 
+? "http://localhost:5000/api/v1/auth/github/callback" 
+: "https://orbi-ji1n.onrender.com/api/v1/auth/github/callback";
 
 // Initiating Google's Client for OAuth
 const google = new arctic.Google(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    redirectURI
+    googleRedirectURI
 );
 
 // Initiating Github's Client for OAuth
 const github = new arctic.GitHub(
     process.env.GITHUB_CLIENT_ID,
     process.env.GITHUB_CLIENT_SECRET, 
-    redirectURI
+    githubRedirectURI
 );
 
 //@desc Register a user
