@@ -10,24 +10,24 @@ import {
   Explore
 } from "./pages/pageImports";
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { useEffect } from "react";
-import { resetStore } from "./store/storeFn";
-import { useDispatch, useSelector } from "react-redux";
 import { login } from "./store/authSlice";
-import { getCurrentUser } from "./services/authServices";
-import Conversation from "./pages/Conversation";
-import ProtectedRoute from "./components/ProtectedRoute";
-import LoadingScreen from "./components/Loaders/LoadingScreen";
-import errorHandler from "./utils/errorHandler";
+import { resetStore } from "./store/storeFn";
 import { useSocket } from "./hooks/useSocket";
+import Conversation from "./pages/Conversation";
+import errorHandler from "./utils/erroHandler";
+import { useDispatch, useSelector } from "react-redux";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { getCurrentUser } from "./services/authServices";
+import LoadingScreen from "./components/Loaders/LoadingScreen";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 const appRoutes = createBrowserRouter([
-  { path: "/", element: <Welcome /> },
-  { path: "/auth", element: <Auth /> },
-  { path: "/about", element: <About /> },
-  { path: "/explore", element: <Explore /> },
-  { path: "/credit", element: <Credits /> },
+  { path: "/", element: <Welcome />, errorElement: <ErrorPage /> },
+  { path: "/auth", element: <Auth />, errorElement: <ErrorPage /> },
+  { path: "/about", element: <About />, errorElement: <ErrorPage /> },
+  { path: "/explore", element: <Explore />, errorElement: <ErrorPage /> },
+  { path: "/credit", element: <Credits />, errorElement: <ErrorPage /> },
   {
     path: "/home",
     element: (
@@ -35,6 +35,7 @@ const appRoutes = createBrowserRouter([
         <LoadingScreen child={<Home />} />
       </ProtectedRoute>
     ),
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "convo/:id",

@@ -1,8 +1,10 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Typewriter from "typewriter-effect";
+import useScreenWidth from "../hooks/useScreenWidth";
 
 const FEATURES = [
+    "ORBI",
     "Security & Privacy",
     "Real-Time Communication",
     "Smart Messaging",
@@ -12,7 +14,9 @@ const FEATURES = [
 ];
 
 const Explore = () => {
-    const sectionRefs = useRef([0, 1, 2, 3, 4, 5]);
+    const screenWidth = useScreenWidth();
+    const sectionRefs = useRef([0, 1, 2, 3, 4, 5, 6]);
+    const [navDrawer, setNavDrawer] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
 
     return (
@@ -34,18 +38,30 @@ const Explore = () => {
 
             {/* Navigation */}
             <nav
-                className="
-                    fixed top-6 left-1/2 -translate-x-1/2
-                    z-50 w-[80%]
-                    lg:w-[82%] max-w-7xl
+                className={`
+                    fixed top-6 left-1/2 -translate-x-1/2 duration-200 transition-all
+                    z-50 ${screenWidth <= 1024 && (navDrawer ? "h-90" : "h-14")}
+                    lg:w-[90%] max-w-7xl
                     rounded-2xl
                     bg-pink-300/50
                     backdrop-blur-md
                     px-4 py-3
-                    flex items-center lg:gap-3
-                    overflow-x-auto scrollbar-hide
-                "
+                    flex flex-col lg:flex-row items-center lg:gap-x-3
+                    overflow-x-auto scrollbar-hide max-lg:gap-y-3
+                `}
             >
+                {/* close and open button */}
+                { screenWidth <= 1024 && 
+                    <button 
+                        onClick={() => setNavDrawer((prev) => !prev)}
+                        className="absolute top-4 right-4 active:bg-black/30 rounded-full px-1.5 transition-all duration-200"
+                    >
+                        {
+                            navDrawer ? <i className="fa-solid fa-angle-up" /> : <i className="fa-solid fa-angle-down" /> 
+                        }
+                    </button>
+                }
+
                 {FEATURES.map((feature, i) => (
                     <button
                         key={feature}
@@ -56,7 +72,7 @@ const Explore = () => {
                         className={`
                             whitespace-nowrap
                             rounded-xl
-                            px-4 py-2 text-xs lg:text-md
+                            px-4 py-2 text-xs md:text-xs lg:text-[1rem]
                             transition-all
                             duration-300
                             ${
@@ -74,13 +90,13 @@ const Explore = () => {
                     <img
                         src="/logos/header.png"
                         alt="ORBI Logo"
-                        className="w-14 transition-transform hover:scale-105 active:scale-95"
+                        className="w-8 lg:w-14 transition-transform hover:scale-105 active:scale-95"
                     />
                 </Link>
             </nav>
 
             {/* Hero */}
-            <section className="relative flex h-screen items-center justify-center">
+            <section ref={(el) => (sectionRefs.current[0] = el)} className="relative flex h-screen items-center justify-center">
 
                 <h1
                     className="
@@ -148,7 +164,7 @@ const Explore = () => {
             
             {/* security and privacy */}
             <section
-                ref={(el) => (sectionRefs.current[0] = el)}
+                ref={(el) => (sectionRefs.current[1] = el)}
                 className="
                     relative flex flex-col items-center gap-y-5 mx-auto max-w-7xl px-6 py-24 z-20 scrollbar-hide
                 "
@@ -177,7 +193,7 @@ const Explore = () => {
 
             {/* real-time communication */}
             <section
-                ref={(el) => (sectionRefs.current[1] = el)}
+                ref={(el) => (sectionRefs.current[2] = el)}
                 className="
                 
                 "

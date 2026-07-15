@@ -20,8 +20,9 @@ const Chatsnippet = ({ userData=null, recipientID=null, recipientAvatar=null, re
     const requestHandler = useCallback(async() => {
         sendRequest(userData?._id, recipientID)
         .then((res) => {
+            const requestId = res?.result._id;
             setRequestBtnState(true);
-            sendNotification(recipientID, "request", res._id).then(() => setRequestBtnState(false));
+            sendNotification(recipientID, "request", requestId).then(() => setRequestBtnState(false));
         })
         .catch((error) => setError(error))
     }, [userData]);

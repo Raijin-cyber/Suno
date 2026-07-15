@@ -40,10 +40,10 @@ const UserSearchPage = () => {
                     >
                         <Chatsnippet 
                             userData={userData}
+                            setError={setError} 
                             recipientID={user?._id} 
                             recipientAvatar={user?.avatar} 
                             recipientName={user?.username}
-                            setError={setError} 
                         />
                     </div>
                 ))

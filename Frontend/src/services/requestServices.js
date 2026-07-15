@@ -5,9 +5,9 @@ import api from "../utils/axios";
 const sendRequest = async(senderID, receiverID) => {
     try {
         const response = await api.post(REQUEST_API.send, { senderID, receiverID }, { withCredentials: true });
-        return response.data.result;
+        return response.data;
     } catch (error) {
-        console.error("Error sending request: ", error.message);
+        console.error("Error sending request: ", error);
         return error;
     }
 }

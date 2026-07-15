@@ -7,7 +7,10 @@ import Request from "../models/requestModel.js";
 const sendRequest = asyncHandler(async(req, res, next) => {
     const { senderID, receiverID } = req.body;
 
-    console.log (senderID, receiverID);
+    if(senderID === receiverID) {
+        res.status(409);
+        throw new Error("Both IDs are same!");
+    }
 
     if(!senderID || !receiverID) {
         res.status(404);
@@ -36,7 +39,7 @@ const sendRequest = asyncHandler(async(req, res, next) => {
         success: true,
         message: "request created",
         result: request,
-    });
+    }); 
 });
 
 //@desc accepts a request message

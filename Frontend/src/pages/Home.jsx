@@ -102,11 +102,11 @@ const Home = () => {
                 </div>
 
                 {/* New conversation floating button */}
-                <div className="absolute bottom-20 right-8">
+                <div className={`absolute bottom-20 right-8`}>
                     {!mode &&
                         <div
                             className={`flex flex-col items-center justify-between gap-y-1 mb-1 transition-all duration-200 ${
-                            addButtonState ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5 pointer-events-none"
+                                addButtonState ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5 pointer-events-none"
                             }`}
                         >
                             <button onClick={() => navigate("/home/srchuser/direct")} className="active:scale-95 transition duration-150 cursor-pointer h-10 w-10 p-1.5 backdrop-blur-xs backdrop-saturate-180 bg-[rgba(17,25,40,0.75)] rounded-full border border-[rgba(255,255,255,0.125)] flex items-center justify-center">
