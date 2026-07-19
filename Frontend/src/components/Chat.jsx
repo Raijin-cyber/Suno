@@ -8,7 +8,7 @@ const Chat = ({
   messageId,
   message,
   creator,
-  readReceipt,
+  readReceipt=false,
   referenceMessage,
   setReferenceMessage,
   referenceMessageCreator,

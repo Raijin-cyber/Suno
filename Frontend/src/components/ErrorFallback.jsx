@@ -7,7 +7,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => {
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center px-6">
-            <div className="flex flex-col items-center max-w-lg w-full rounded-xl shadow-lg p-4 text-center">
+            <div className="flex flex-col items-center max-w-3xl w-full rounded-xl shadow-lg p-4 text-center">
                 <img loading="lazy" className="w-25" src="/assets/illustrations/sad-guy.png" alt="sad_guy" />
 
                 <h1 className="text-2xl font-bold text-gray-900">

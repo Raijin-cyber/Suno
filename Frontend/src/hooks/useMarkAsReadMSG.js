@@ -24,6 +24,7 @@ const useMarkAsReadMSG = ({ conversationId, conversations }) => {
 
         if(unreadMessages.length > 0) {
             unreadMessages.forEach((u) => {
+                // socket event
                 emitMarkAsReadEvent(socket,
                     {
                         conversationId: conversationId,

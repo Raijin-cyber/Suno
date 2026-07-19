@@ -77,15 +77,17 @@ const Home = () => {
                     {mode && <Outlet context={{ convoType: mode, searchQuery: query, setError: setError }}/>}
         
                     {(!mode && userData) && (
-                        <div className="cursor-pointer flex flex-col gap-y-3 w-full">
+                        <div className="flex flex-col gap-y-3 w-full">
                             {conversations?.map((convo) => {
                             
                             let recipientName;
+                            let recipientAvatar;
                             if (convo.convoType === "direct") {
                                 const recipient = convo.members.find(
                                     (member) => member._id.toString() !== userData?._id
                                 );
                                 recipientName = recipient?.username;
+                                recipientAvatar = recipient?.avatar;
                             }
 
                             return (
@@ -94,6 +96,7 @@ const Home = () => {
                                         conversationData={chatSnippetData[convo.convoId]}
                                         conversationId={convo.convoId}
                                         recipientName={recipientName}
+                                        recipientAvatar={recipientAvatar}
                                     />
                                 );
                             })}

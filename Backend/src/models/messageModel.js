@@ -27,12 +27,17 @@ const messageSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    readByAt: [
-        {
-            userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-            readAt: { type: Date, default: Date.now }
-        }
-    ]
+    readByAt: {
+        type: Map,
+        of: new mongoose.Schema(
+            {
+            readerUsername: { type: String },
+            readTime: { type: Date, default: Date.now }
+            },
+            { _id: false } // don’t generate an _id for each subdocument
+        ),
+        default: {},
+    }
 },
     {
         timestamps: true

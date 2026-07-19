@@ -15,10 +15,9 @@ const listenForMarkAsReadEvent = (socket, dispatch) => {
 }
 
 const emitMarkAsReadEvent = (socket, { conversationId, messageId, readerUsername, readerId, readTime }) => {
-    markAsReadMessage(messageId, readerId, readTime)
+    markAsReadMessage(messageId, readerId, readerUsername, readTime)
     .then((res) => {
         socket.emit(SOCKET_EVENTS.MESSAGE_MARK_READ, { conversationId, messageId, readerUsername, readerId, readTime })
-        console.log(res);
     });
 }
 

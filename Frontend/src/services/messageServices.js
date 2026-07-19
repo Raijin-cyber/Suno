@@ -38,10 +38,10 @@ const fetchUnreadMessage = async(id) => {
 }
 
 // @desc PATCH Marks document as Read.
-// @params accepts 5 params
-const markAsReadMessage = async(messageId, readerId, readTime) => {
+// @params accepts 3 params
+const markAsReadMessage = async(messageId, readerId, readerUsername, readTime) => {
     try {
-        const response = await api.patch(MESSAGE_API.read, { messageId, readerId, readTime }, { withCredentials: true });
+        const response = await api.patch(MESSAGE_API.read, { messageId, readerId, readerUsername, readTime }, { withCredentials: true });
         return response.data;
     } catch (error) {
         console.error("Error marking messages as read", error.message);

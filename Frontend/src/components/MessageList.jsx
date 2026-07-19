@@ -70,11 +70,7 @@ return (
                     referenceMessageCreator={msg?.referenceMessageCreator}
                     setReferenceMessage={setReferenceMessage}
                     convoType={conversationContext?.convoType || "group"}
-                    readReceipt={msg.readByAt?.some(
-                        (c) =>
-                        c.readerId === participant?._id ||
-                        c.userId === participant?._id
-                    )}
+                    readReceipt={!!msg.readByAt[participant?._id] || false}
                 />
             </div>
         );

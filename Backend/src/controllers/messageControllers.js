@@ -118,17 +118,16 @@ const fetchUnreadMessage = asyncHandler(async(req, res, next) => {
 
     const unreadMessages = await Message.find({
         convoId,
-        readByAt: { 
-            $not: { $elemMatch: { userId: userA_ID } } 
-        }
+        [`readByAt.${userA_ID}`]: { $exists: false }
     })
     .sort({ createdAt: -1 })
-    .populate("senderId", "username")
+    .populate("senderId", "username") // still needed for sender info
     .populate({
         path: "referenceMessage",
         select: "encryptedText senderId",
         populate: { path: "senderId", select: "username" }
     });
+
 
     if(unreadMessages.length === 0) {
         res.status(200);
@@ -137,8 +136,6 @@ const fetchUnreadMessage = asyncHandler(async(req, res, next) => {
             message: "There are no unread messages",
         });
     }
-
-    unreadMessages.reverse();
 
     res.status(200);
     res.json({
@@ -153,7 +150,7 @@ const fetchUnreadMessage = asyncHandler(async(req, res, next) => {
 //@route " PATCH /api/v1/message/mark-read"
 //@access private
 const markAsReadMessage = asyncHandler(async(req, res, next) => {
-    const { messageId, readerId, readTime } = req.body;
+    const { messageId, readerId, readerUsername, readTime } = req.body;
 
     // check for required Data
     if( !messageId || !readerId || !readTime ) {
@@ -161,20 +158,20 @@ const markAsReadMessage = asyncHandler(async(req, res, next) => {
         throw new Error("Bad Request: messageId, readerId, readTime are required");
     }
 
-    const updatedMessage = await Message.findByIdAndUpdate(
+    const targetMessage = await Message.findByIdAndUpdate(
         messageId,
         {
-        $addToSet: {
-                readByAt: {
-                    userId: readerId,
-                    readAt: readTime || new Date() // or req.body.readAt if you want client‑side timestamp
+            $set: {
+                [`readByAt.${readerId}`]: {
+                    readerUsername,
+                    readTime: readTime || new Date()
                 }
             }
         },
         { new: true }
     );
 
-    if (!updatedMessage) {
+    if (!targetMessage) {
         res.status(404);
         throw new Error("Message not found");
     }
@@ -183,7 +180,7 @@ const markAsReadMessage = asyncHandler(async(req, res, next) => {
     res.json({
         success: true,
         message: "Message marked as read",
-        data: updatedMessage
+        data: targetMessage
     });
 });
  

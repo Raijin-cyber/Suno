@@ -6,6 +6,7 @@ import MessageComposer from "../components/MessageComposer";
 import TypingIndicator from "../components/TypingIndicator";
 import { emitMarkAsReadEvent } from "../socket/conversation";
 import MirageCustom from "../components/Loaders/MirageCustom";
+import { selectMessagesByConvoId } from "../store/messagesSlice";
 import useFetchMessageBatch from "../hooks/useFetchMessageBatch";
 import ConversationHeader from "../components/ConversationHeader";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
@@ -36,8 +37,8 @@ const Conversation = () => {
       (state) => state.conversations.byId[roomId]?.typingUsers
     );
 
-    const conversationMessages = useSelector(
-      (state) => state.messages.byConversationId[roomId]
+    const conversationMessages = useSelector((state) => 
+      selectMessagesByConvoId(state, roomId)
     ) || [];
 
     const participant = useMemo(() => {
