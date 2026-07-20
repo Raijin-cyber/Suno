@@ -18,7 +18,7 @@ const Chatsnippet = ({
     const [instantDialogState, setInstantDialogState] = useState(false);
     const { storedValue: instantMessages, setValue: setInstantMessages, clearKey, error } = useKeyLocalStorage(conversationId, ["Got it", "On it", "Sure", "Thanks", "Done"]);
     const regex =
-        /(\/emojis library\/([^/]+)\/([A-Za-z0-9-]+)_u([a-f0-9_]+)\.json)&([\p{Emoji}\u200d\ufe0f]+)/giu;
+        /(\/emojis-library\/([^/]+)\/([A-Za-z0-9-]+)_u([a-f0-9_]+)\.json)&([\p{Emoji}\u200d\ufe0f]+)/iu;
 
     // Navigate to conversation page
     const roomHandler = useCallback(() => {
@@ -67,11 +67,11 @@ const Chatsnippet = ({
                         <div className="flex flex-col flex-1 items-start min-w-0">
                             <p className="font-semibold">{recipientName}</p>
                             {conversationData?.lastMessage ? (
-                                <>
+                                <div className="line-clamp-1 break-all">
                                     {regex.test(conversationData.lastMessage)
                                         ? extractLastEmoji(conversationData.lastMessage)
                                         : conversationData.lastMessage}
-                                </>
+                                </div>
                             ) : (
                                 <i>No messages to show</i>
                             )}

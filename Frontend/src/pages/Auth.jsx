@@ -15,42 +15,42 @@ const reactions = [
     {
         registerMessage: "Hello there!", 
         loginMessage: "Welcom back!", 
-        emoji: "/emojis library/Smileys and emotions/Heart-face_u1f970.json"
+        emoji: "/emojis-library/Smileys-and-emotions/Heart-face_u1f970.json"
     },
     {
         registerMessage: "Welcom to ORBI.", 
         loginMessage: "Yayyyyy! You came back.", 
-        emoji: "/emojis library/Smileys and emotions/Partying-face_u1f973.json"
+        emoji: "/emojis-library/Smileys-and-emotions/Partying-face_u1f973.json"
     },
     {
         registerMessage: "Helloooooo!", 
         loginMessage: "Hellooo there!", 
-        emoji: "/emojis library/Smileys and emotions/Melting_u1fae0.json"
+        emoji: "/emojis-library/Smileys-and-emotions/Melting_u1fae0.json"
     },
     {
         registerMessage: "Welcome aboard — ORBI’s got your back.", 
         loginMessage: "We were missing you.", 
-        emoji: "/emojis library/Smileys and emotions/Holding-back-tears_u1f979.json"
+        emoji: "/emojis-library/Smileys-and-emotions/Holding-back-tears_u1f979.json"
     },
     {
         registerMessage: "Nice to meet you explorer!", 
         loginMessage: "Welcome back friend!", 
-        emoji: "/emojis library/Smileys and emotions/Warm-smile_u263a_fe0f.json"
+        emoji: "/emojis-library/Smileys-and-emotions/Warm-smile_u263a_fe0f.json"
     },
     {
         registerMessage: "Finally someone! Welcome to ORBI.", 
         loginMessage: "Hope you are doing good.", 
-        emoji: "/emojis library/Smileys and emotions/Relieved_u1f60c.json"
+        emoji: "/emojis-library/Smileys-and-emotions/Relieved_u1f60c.json"
     },
     {
         registerMessage: "Yessss... you are making the right decision.", 
         loginMessage: "Just do it.", 
-        emoji: "/emojis library/Smileys and emotions/Head-nod_u1f642_200d_2195_fe0f.json"
+        emoji: "/emojis-library/Smileys-and-emotions/Head-nod_u1f642_200d_2195_fe0f.json"
     },
     {
         registerMessage: "Nice to see you.", 
         loginMessage: "Huhh... youu!", 
-        emoji: "/emojis library/Smileys and emotions/Smirk_u1f60f.json"
+        emoji: "/emojis-library/Smileys-and-emotions/Smirk_u1f60f.json"
     },
 ]
 

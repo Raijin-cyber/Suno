@@ -2,7 +2,7 @@ import { useState, memo, useCallback, useMemo } from "react";
 import Emoji from "./EmojiPicker/Emoji";
 
 const emojiRegex =
-  /(\/emojis library\/([^/]+)\/([A-Za-z0-9-]+)_u([a-f0-9_]+)\.json)&([\p{Emoji}\u200d\ufe0f]+)/iu;
+  /(\/emojis-library\/([^/]+)\/([A-Za-z0-9-]+)_u([a-f0-9_]+)\.json)&([\p{Emoji}\u200d\ufe0f]+)/iu;
 
 const Chat = ({
   messageId,
