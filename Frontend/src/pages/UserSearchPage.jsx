@@ -1,9 +1,10 @@
+import { useSelector } from "react-redux";
 import { useEffect, useState, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import { searchUser } from "../services/authServices";
 import Chatsnippet from "../components/ChatSnippet/Chatsnippet";
 import CsShimmerUI from "../components/ChatSnippet/CsShimmerUI";
-import { useSelector } from "react-redux";
+import AddUserProfile from "../components/AddUserProfile";
 
 const UserSearchPage = () => {
     const searchTimeout = useRef(null);
@@ -38,7 +39,7 @@ const UserSearchPage = () => {
                         key={user?._id}
                         className="animate-fade-in-down animate-duration-300 animate-ease-out"
                     >
-                        <Chatsnippet 
+                        <AddUserProfile
                             userData={userData}
                             setError={setError} 
                             recipientID={user?._id} 
@@ -52,8 +53,21 @@ const UserSearchPage = () => {
             {/* message */}
             {!loading &&
                 <div className="text-[1rem] text-center text-black/60 h-full w-full flex items-center justify-center">
-                    {users?.length === 0 && !searchQuery && <p className="animate-fade-in animate-duration-200">Search for users.</p>}
-                    {users?.length === 0 && searchQuery && <p className="animate-fade-in animate-duration-200">No user found with that username.</p>}
+                    {users?.length === 0 && !searchQuery && 
+                        <p 
+                            className="animate-fade-in animate-duration-200"
+                        >
+                            Search for users.
+                        </p>
+                    }
+                    {users?.length === 0 && searchQuery && 
+                        <p 
+                            className="animate-fade-in animate-duration-200"
+                        >
+                            Sorry, no user found with that username.
+                            TODO: Create Invite Link
+                        </p>
+                    }
                 </div>
 
             }

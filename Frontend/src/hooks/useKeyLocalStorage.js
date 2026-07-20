@@ -36,7 +36,7 @@ const useKeyLocalStorage = (key, initialValue) => {
     }
   }, [key, initialValue]);
 
-  return { storedValue, setValue, clearKey, error };
+  return { storedValue, setStoredValue, setValue, clearKey, error };
 };
 
 export default useKeyLocalStorage;
