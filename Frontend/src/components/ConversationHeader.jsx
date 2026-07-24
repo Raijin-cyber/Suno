@@ -9,7 +9,7 @@ const ConversationHeader = ({
             {/* Avatar and call, video call and ellipsis buttons */}
             <div className="flex items-center gap-x-3">
               <div onClick={handleCloseConversation} className="cursor-pointer rounded-full active:bg-black/20 transition duration-120 object-cover"><img src="/assets/icons/back.png" alt="back" /></div>
-              <div className="cursor-pointer rounded-full object-cover h-10 w-10 md:h-15 md:w-15"><img src={`/avatars/${participant?.username[0].toUpperCase()}.png`} alt="avatar" /></div>
+              <div className="cursor-pointer rounded-full object-cover h-10 w-10 md:h-15 md:w-15"><img className="rounded-full" src={participant?.avatar ? participant?.avatar : `/avatars/${participant?.username[0].toUpperCase()}.png`} alt="avatar" /></div>
               <div className="flex flex-col items-start">
                   <span className="text-[1.10rem] md:text-xl tracking-tight">{conversationContext?.convoType === "direct" ? participant?.username : "Group"}</span>
                   <span className="text-[0.8rem] md:text-xs font-light tracking-tight">{otherMemberStatus}</span>

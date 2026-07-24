@@ -7,7 +7,8 @@ import {
   UserSearchPage, 
   ErrorPage,
   Credits, 
-  Explore
+  Explore,
+  UserProfile
 } from "./pages/pageImports";
 
 import { useEffect } from "react";
@@ -56,6 +57,15 @@ const appRoutes = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <UserSearchPage />
+          </ProtectedRoute>
+        ),
+        errorElement: <ErrorPage code={404} message={"Uh'oh, requested page was not found!"}/>
+      },
+      {
+        path: "profile/:id/:userId",
+        element: (
+          <ProtectedRoute>
+            <UserProfile />
           </ProtectedRoute>
         ),
         errorElement: <ErrorPage code={404} message={"Uh'oh, requested page was not found!"}/>

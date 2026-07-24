@@ -13,8 +13,6 @@ const createConvo = asyncHandler(async(req, res, next) => {
     const {convoType, userB_ID, participants_ID} = req.body;
     const userA_ID = req.cookies.userA_ID;
 
-    console.log(userA_ID, userB_ID);
-
     if(convoType === "direct") {
         if(!userA_ID || !userB_ID) {
             res.status(400);
@@ -142,7 +140,7 @@ const getAllConvo = asyncHandler(async(req, res, next) => {
     )
     .populate({
         path: "members",
-        select: "username avatar"
+        select: "username avatar name bio isVerified"
     })
     .populate({
         path: "lastMessage",

@@ -26,6 +26,13 @@ const Chatsnippet = ({
         navigate(`/home/convo/${conversationId}`);
     }, [conversationId]);
 
+    // Navigate to profile page
+    const profileHandler = useCallback((e) => {
+        e.stopPropagation();
+        if(!recipientID) return;
+        navigate(`/home/profile/${conversationId}/${recipientID}`);
+    }, [recipientID]);
+
     // Extract last grapheme (emoji or character)
     const extractLastEmoji = useCallback((text) => {
         const graphemes = [
@@ -52,7 +59,10 @@ const Chatsnippet = ({
                     {/* Left section: Avatar + Content */}
                     <div className="flex items-center gap-3 w-[85%]">
                         {/* Avatar */}
-                        <div className="w-12 cursor-pointer">
+                        <div 
+                            onClick={profileHandler}
+                            className="w-12 cursor-pointer"
+                        >
                             {recipientAvatar ? (
                                 <img className="rounded-full" src={recipientAvatar} alt="avatar" />
                             ) : (

@@ -1,4 +1,4 @@
-import Chat from "./Chat";
+import Chat from "./Chat/Chat";
 import { memo, useEffect, useImperativeHandle } from "react";
 import { useVirtualizer, Virtualizer } from "@tanstack/react-virtual";
 
