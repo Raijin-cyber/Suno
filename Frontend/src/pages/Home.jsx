@@ -8,10 +8,12 @@ import Dashboard from "../components/Dashboard/Dashboard";
 import Chatsnippet from "../components/ChatSnippet/Chatsnippet";
 import NotificationPane from "../components/NotificationPane/NotificationPane";
 
+import usePresence from "../hooks/usePresence";
 import useJoinRooms from "../hooks/useJoinRooms";
-import useMountListeners from "../hooks/useMountListeners";
+import usePingServer from "../hooks/usePingServer";
 import useConversations from "../hooks/useConversations";
 import useNotifications from "../hooks/useNotifications";
+import useMountListeners from "../hooks/useMountListeners";
 import useListenForWSConnErrors from "../hooks/useListenForWSConnErrors";
 
 
@@ -63,11 +65,28 @@ const Home = () => {
     // cache the conversations data
     const convoData = useMemo(() => {
         const convoDataHolder = new Map();
-        conversations.forEach(c => {
+        conversations?.forEach(c => {
             convoDataHolder.set(c.convoId, c);
         })
         return convoDataHolder;
     }, [conversations]);
+
+    // cache the room Ids
+    const conversationIds = useMemo(() => {        
+        return Array.from(convoData.keys());
+    }, [convoData]);
+
+    // emit presence satus
+    usePresence({ 
+        userId: userData?._id, 
+        conversationIds 
+    });
+
+    // keep presence status alive
+    const { ping } = usePingServer({ 
+        userId: userData?._id, 
+        conversationIds 
+    })
 
     return (
         <div className="h-screen flex relative">

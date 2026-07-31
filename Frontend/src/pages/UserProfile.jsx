@@ -17,7 +17,7 @@ const UserProfile = ({ isOnline, avatar }) => {
 
     return (
         <aside className="animate-fade-in animate-duration-100 fixed inset-0 z-50 flex items-end justify-center md:static md:h-full md:shrink-0 md:items-stretch">
-            <div className="relative flex h-[94vh] w-full flex-col overflow-hidden md:h-full md:rounded-none">
+            <div className="relative flex h-screen w-full flex-col overflow-hidden md:h-full md:rounded-none">
                 {/* Mobile drag handle */}
                 <div className="absolute left-1/2 top-3 z-10 h-1 w-12 -translate-x-1/2 rounded-full bg-[#fc94af]/40 md:hidden" />
 

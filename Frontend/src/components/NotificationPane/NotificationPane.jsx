@@ -6,7 +6,7 @@ const NotificationPane = ({isNotifiOpen=false, setIsNotifiOpen, notifications=[]
         <div id="notification pane" className={`${isNotifiOpen ? "translate-x-0" : "-translate-x-full"} z-20 absolute left-0 top-0 p-3 flex flex-col gap-y-5 ease-in-out max-md:bottom-0 overflow-hidden md:left-0 md:top-0 transition-all duration-500 bg-[#fc94Af] h-full w-full max-w-screen`}>
             <div className="flex items-center justify-center">
                 <p className="font-sans text-center text-2xl font-medium w-full">Notification</p>
-                <button onClick={() => setIsNotifiOpen(prev => false)} className="absolute right-3 top-3 w-9 active:scale-90 transition-all duration-200 border border-black/20 bg-black/50 rounded-full"><img src="/assets/icons/cross.png" alt="cross" /></button>
+                <button onClick={() => setIsNotifiOpen(prev => false)} className="absolute right-3 top-4 w-7 active:scale-90 transition-all duration-50 bg-black/50 rounded-full"><img src="/assets/icons/cross.png" alt="cross" /></button>
             </div>
             
             {/* notifications area */}
@@ -32,7 +32,7 @@ const NotificationPane = ({isNotifiOpen=false, setIsNotifiOpen, notifications=[]
                             items-center gap-y-5
                             absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
                         ">
-                        <img className="w-80" src="/assets/illustrations/Chilling-cuate.svg" alt="Chilling-cuate" />
+                        <img loading="lazy" className="w-80" src="/assets/illustrations/Chilling-cuate.svg" alt="Chilling-cuate" />
                         <p 
                             className="
                                 text-xl font-normal italic

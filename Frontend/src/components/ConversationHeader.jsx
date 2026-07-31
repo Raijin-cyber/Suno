@@ -1,9 +1,22 @@
+import { useEffect } from "react";
+import formatTime from "../utils/formatTime";
+import useKeyLocalStorage from "../hooks/useKeyLocalStorage";
+
 const ConversationHeader = ({
     conversationContext,
     participant,
     otherMemberStatus,
+    otherMemberLastSeen,
     handleCloseConversation
 }) => {
+
+    const { storedValue: cachedOtherMemberLastSeen, setStoredValue, setValue } = useKeyLocalStorage(
+        conversationContext?._id,
+        formatTime(Number(otherMemberLastSeen), { detailed: true })
+    )
+
+    useEffect(() => setValue(formatTime(Number(otherMemberLastSeen), { detailed: true }), [otherMemberStatus, otherMemberLastSeen]))
+
     return (
         <>
             {/* Avatar and call, video call and ellipsis buttons */}
@@ -12,7 +25,7 @@ const ConversationHeader = ({
               <div className="cursor-pointer rounded-full object-cover h-10 w-10 md:h-15 md:w-15"><img className="rounded-full" src={participant?.avatar ? participant?.avatar : `/avatars/${participant?.username[0].toUpperCase()}.png`} alt="avatar" /></div>
               <div className="flex flex-col items-start">
                   <span className="text-[1.10rem] md:text-xl tracking-tight">{conversationContext?.convoType === "direct" ? participant?.username : "Group"}</span>
-                  <span className="text-[0.8rem] md:text-xs font-light tracking-tight">{otherMemberStatus}</span>
+                  <span className={`${otherMemberStatus === "online" ? "text-green-700" : "text-black/60"} font-normal text-[0.8rem] md:text-xs tracking-tight`}>{otherMemberStatus === "online" ? otherMemberStatus : `Last seen ${cachedOtherMemberLastSeen}`}</span>
               </div>
             </div>
             <div className="flex items-center">

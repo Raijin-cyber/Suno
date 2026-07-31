@@ -6,14 +6,15 @@ import { redis } from "../../index.js";
 const listenForOnlineUsersEvent = (io, socket) => {
     socket.on(SOCKET_EVENTS.PRESENCE_ONLINE, async({ userId, conversationIds }) => {
         if(userId && Array.isArray(conversationIds)) {
+
             // Update Redis for each conversation
             for (const conversationId of conversationIds) {
                 await redis.hset(`presence:${conversationId}:${userId}`, {
                     status: "online",
                     lastSeen: Date.now(),
                 });
-
-                await redis.expire(`presence:${conversationId}:${userId}`, 120);
+                
+                await redis.expire(`presence:${conversationId}:${userId}`, 40);
 
                 // Fetch all members in this conversation
                 const keys = await redis.keys(`presence:${conversationId}:*`);
@@ -22,7 +23,6 @@ const listenForOnlineUsersEvent = (io, socket) => {
                     const data = await redis.hgetall(key);
                     members.push({ userId: key.split(":")[2], ...data });
                 }
-
                 io.to(conversationId).emit(SOCKET_EVENTS.PRESENCE_ONLINE, { conversationId, members });
             }
         }
@@ -32,6 +32,7 @@ const listenForOnlineUsersEvent = (io, socket) => {
 const listenForOfflineUsersEvent = (io, socket) => {
     socket.on(SOCKET_EVENTS.PRESENCE_OFFLINE, async({ userId, conversationIds }) => {
         if(userId && Array.isArray(conversationIds)) {
+            
             // Update Redis for each conversation
             for (const conversationId of conversationIds) {
                 await redis.hset(`presence:${conversationId}:${userId}`, {
@@ -61,7 +62,7 @@ const listenForPresencePingEvent = (io, socket) => {
                 lastSeen: Date.now()
             });
             
-            await redis.expire(`presence:${conversationId}:${userId}`, 120);
+            await redis.expire(`presence:${conversationId}:${userId}`, 40);
         }
     });
 

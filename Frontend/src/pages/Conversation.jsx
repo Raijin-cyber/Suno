@@ -47,11 +47,9 @@ const Conversation = () => {
       );
     }, [conversationContext, userData]);
 
-    const otherMemberStatus = useMemo(() => {
-      return onlineMembers?.find(
-        m => m.userId !== userData?._id
-      )?.status || "offline";
-    }, [onlineMembers, userData])
+    const otherMember = useMemo(() => {
+      return onlineMembers?.find(m => m.userId !== userData?._id)
+    }, [onlineMembers, userData]);
 
     const {
       trigger: inView,
@@ -165,7 +163,8 @@ const Conversation = () => {
             <ConversationHeader 
               conversationContext={conversationContext}
               participant={participant}
-              otherMemberStatus={otherMemberStatus}
+              otherMemberStatus={otherMember?.status || "offline"}
+              otherMemberLastSeen={otherMember?.lastSeen || ''}
               handleCloseConversation={handleCloseConversation}
             />
         </div>

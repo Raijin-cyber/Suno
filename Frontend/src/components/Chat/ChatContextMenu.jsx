@@ -19,7 +19,7 @@ const ChatContextMenu = ({ chatContextRef, chatContextState, setChatContextState
         <div 
             className="
                 absolute flex flex-col items-start justify-evenly 
-                -top-50 -right-5 bg-[#ffffff]/20 h-fit text-[1.1rem] rounded-xl
+                -top-50 -right-5 bg-[#ffffff]/20 backdrop-blur-xl h-fit text-[1.1rem] rounded-xl
             "
         > 
             <span className="flex items-center gap-x-3 cursor-pointer hover:bg-black/20 active:bg-black/20 w-full h-full px-3 py-1.5 rounded-t-xl">
