@@ -38,6 +38,14 @@ const userSchema = new mongoose.Schema({
     name: {
         type: String
     },
+    bio: {
+        type: String,
+        default: ''
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
     publicKey: {
         type: String,
         default: null,

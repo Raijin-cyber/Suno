@@ -6,6 +6,8 @@ import UserSearchPage from "./UserSearchPage";
 import ErrorPage from "./ErrorPage";
 import Credits from "./Credits"
 import Explore from "./Explore"
+import UserProfile from "./UserProfile";
+import Settings from "./Settings";
 
 export {
     Auth,
@@ -15,5 +17,7 @@ export {
     UserSearchPage,
     ErrorPage,
     Credits,
-    Explore
+    Explore,
+    UserProfile,
+    Settings
 }

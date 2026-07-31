@@ -88,6 +88,8 @@ const loginUser = asyncHandler(async(req, res, next) => {
             {
                 user: {
                     _id: user._id,
+                    name: user.name || '',
+                    avatar: user.avatar || '',
                     username: user.username,
                 },
             },
@@ -102,6 +104,8 @@ const loginUser = asyncHandler(async(req, res, next) => {
             {
                 user: {
                     _id: user._id,
+                    name: user.name || '',
+                    avatar: user.avatar || '',
                     username: user.username,
                 },
             },
@@ -116,6 +120,8 @@ const loginUser = asyncHandler(async(req, res, next) => {
             {
                 user: {
                     _id: user._id,
+                    name: user.name || '',
+                    avatar: user.avatar || '',
                     username: user.username,
                 },
             },
@@ -164,6 +170,8 @@ const loginUser = asyncHandler(async(req, res, next) => {
             message: "Successfully logged in.",
             userData: {
                 _id: user._id,
+                name: user.name || '',
+                avatar: user.avatar || '',
                 username: user.username,
             }
         });
@@ -264,11 +272,11 @@ const googleAuthCallbackHandler = asyncHandler(async (req, res, next) => {
     }
 
     // JWTs
-    const accessToken = jwt.sign({ user: { _id: user._id, username: user.username } },
+    const accessToken = jwt.sign({ user: { _id: user._id, name: user.name || '', avatar: user.avatar || '', username: user.username, } },
         process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
-    const refreshToken = jwt.sign({ user: { _id: user._id, username: user.username } },
+    const refreshToken = jwt.sign({ user: { _id: user._id, name: user.name || '', avatar: user.avatar || '', username: user.username, } },
         process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
-    const wsToken = jwt.sign({ user: { _id: user._id, username: user.username } },
+    const wsToken = jwt.sign({ user: { _id: user._id, name: user.name || '', avatar: user.avatar || '', username: user.username, } },
         process.env.WS_TOKEN_SECRET, { expiresIn: "15m" });
 
     // Cookies
@@ -279,7 +287,6 @@ const googleAuthCallbackHandler = asyncHandler(async (req, res, next) => {
 
     res.redirect(process.env.NODE_ENV === "production" ? process.env.FRONTEND_HOST + "/home" : "http://localhost:5173/home");
 });
-
 
 //@desc Initiates OAuth flow for github
 //@route " GET /api/v1/auth/github"
@@ -423,10 +430,7 @@ const githubAuthCallbackHandler = asyncHandler(async (req, res) => {
 
     // Generate JWTs
     const jwtPayload = {
-        user: {
-            _id: user._id,
-            username: user.username,
-        },
+        user: { _id: user._id, name: user.name || '', avatar: user.avatar || '', username: user.username },
     };
 
     const accessJWT = jwt.sign(

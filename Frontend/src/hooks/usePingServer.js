@@ -1,15 +1,18 @@
-import { useSocket } from "./useSocket";
 import { useEffect } from "react";
+import { useSocket } from "./useSocket";
 import { emitPresencePingEvent } from "../socket/presence";
 
-const usePingServer = (id) => {
+const usePingServer = ({ userId, conversationIds }) => {
     const socket  = useSocket();
 
+    // following heartbeat method
     const ping = () => {
         const interval = setInterval(() => {
+            if(!userId || !conversationIds) return;
+
             emitPresencePingEvent(socket, {
-                userId: id
-                // pass the room Ids and store in the redis. 
+                userId,
+                conversationIds
             })
         }, 30000);
 
@@ -22,7 +25,9 @@ const usePingServer = (id) => {
         return () => {
             clearInterval(pingInterval);
         }
-    }, []);
+    }, [userId, conversationIds]);
+
+    return ping;
 }
 
 export default usePingServer;

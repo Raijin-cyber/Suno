@@ -1,4 +1,4 @@
-import {  useRef, useState } from "react";
+import {  useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import useScreenWidth from "../hooks/useScreenWidth";
@@ -8,17 +8,19 @@ import Dashboard from "../components/Dashboard/Dashboard";
 import Chatsnippet from "../components/ChatSnippet/Chatsnippet";
 import NotificationPane from "../components/NotificationPane/NotificationPane";
 
+import usePresence from "../hooks/usePresence";
 import useJoinRooms from "../hooks/useJoinRooms";
-import useMountListeners from "../hooks/useMountListeners";
+import usePingServer from "../hooks/usePingServer";
 import useConversations from "../hooks/useConversations";
 import useNotifications from "../hooks/useNotifications";
+import useMountListeners from "../hooks/useMountListeners";
 import useListenForWSConnErrors from "../hooks/useListenForWSConnErrors";
 
 
 const Home = () => {
     const navigate = useNavigate();
-    const { id, mode } = useParams();
     const screenWidth = useScreenWidth();
+    const { id, mode, userId } = useParams();
     const [addButtonState, setAddButtonState] = useState(false);
     
     // Fetching from the Redux Store
@@ -60,6 +62,32 @@ const Home = () => {
         refresh: notificationsRefresh
     } = useNotifications();
 
+    // cache the conversations data
+    const convoData = useMemo(() => {
+        const convoDataHolder = new Map();
+        conversations?.forEach(c => {
+            convoDataHolder.set(c.convoId, c);
+        })
+        return convoDataHolder;
+    }, [conversations]);
+
+    // cache the room Ids
+    const conversationIds = useMemo(() => {        
+        return Array.from(convoData.keys());
+    }, [convoData]);
+
+    // emit presence satus
+    usePresence({ 
+        userId: userData?._id, 
+        conversationIds 
+    });
+
+    // keep presence status alive
+    const { ping } = usePingServer({ 
+        userId: userData?._id, 
+        conversationIds 
+    })
+
     return (
         <div className="h-screen flex relative">
             {/* Conversations pane */}
@@ -77,23 +105,29 @@ const Home = () => {
                     {mode && <Outlet context={{ convoType: mode, searchQuery: query, setError: setError }}/>}
         
                     {(!mode && userData) && (
-                        <div className="cursor-pointer flex flex-col gap-y-3 w-full">
+                        <div className="flex flex-col gap-y-3 w-full">
                             {conversations?.map((convo) => {
                             
+                            let recipientId;
                             let recipientName;
+                            let recipientAvatar;
                             if (convo.convoType === "direct") {
                                 const recipient = convo.members.find(
                                     (member) => member._id.toString() !== userData?._id
                                 );
+                                recipientId = recipient?._id;
                                 recipientName = recipient?.username;
+                                recipientAvatar = recipient?.avatar;
                             }
 
                             return (
                                 <Chatsnippet
                                         key={convo.convoId}
-                                        conversationData={chatSnippetData[convo.convoId]}
+                                        recipientID={recipientId}
                                         conversationId={convo.convoId}
                                         recipientName={recipientName}
+                                        recipientAvatar={recipientAvatar}
+                                        conversationData={chatSnippetData[convo.convoId]}
                                     />
                                 );
                             })}
@@ -158,7 +192,7 @@ const Home = () => {
                 
                     {/* Message when no conversation is opened */}
                     {
-                        (!mode && showPlaceholder) &&
+                        (!userId && !mode && showPlaceholder) &&
                         <div className="hidden md:flex flex-col items-center gap-y-1 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  w-[40%] px-5">
                             <img src="/assets/illustrations/Light bulb-cuate.png" alt="" />
                             <p className="text-center font-light mb-5">Tip: Select a conversation to see its chats here.</p>
@@ -175,10 +209,20 @@ const Home = () => {
                     }
 
                     {/* Chats */}
-                    <div className="h-full w-full">
-                        {/* this for the chat sub page with the existing conversations */}
-                        {id && <Outlet context={conversations?.find((convo) => id === convo?.convoId)}/>}
-                    </div>
+                    {(id && !userId) &&
+                        <div className="h-full w-full">
+                            {/* this for the chat sub page with the existing conversations */}
+                            <Outlet context={convoData.get(id)}/>
+                        </div>
+                    }
+
+                    {/* Profile */}
+                    {(id && userId) &&
+                        <div className="h-full w-full">
+                            {/* this for the profile sub page with the existing users */}
+                            <Outlet context={convoData.get(id)?.members.find(u => u._id === userId)}/>
+                        </div>
+                    }
                 
                 </div>
             }

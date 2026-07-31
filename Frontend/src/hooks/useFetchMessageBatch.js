@@ -27,6 +27,7 @@ const useFetchMessageBatch = ({ conversationId, userData, trigger }) => {
                     setHasMore(false);
                     return;
                 }
+
                 store.dispatch(updateOldMessage(
                     { 
                         oldMessages: messages, 

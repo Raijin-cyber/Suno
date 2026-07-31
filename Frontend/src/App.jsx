@@ -7,7 +7,9 @@ import {
   UserSearchPage, 
   ErrorPage,
   Credits, 
-  Explore
+  Explore,
+  UserProfile,
+  Settings
 } from "./pages/pageImports";
 
 import { useEffect } from "react";
@@ -15,36 +17,41 @@ import { login } from "./store/authSlice";
 import { resetStore } from "./store/storeFn";
 import { useSocket } from "./hooks/useSocket";
 import Conversation from "./pages/Conversation";
-import errorHandler from "./utils/erroHandler";
+import errorHandler from "./utils/errorHandler";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "./components/ErrorFallback";
 import { useDispatch, useSelector } from "react-redux";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { getCurrentUser } from "./services/authServices";
-import LoadingScreen from "./components/Loaders/LoadingScreen";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 const appRoutes = createBrowserRouter([
-  { path: "/", element: <Welcome />, errorElement: <ErrorPage /> },
-  { path: "/auth", element: <Auth />, errorElement: <ErrorPage /> },
-  { path: "/about", element: <About />, errorElement: <ErrorPage /> },
-  { path: "/explore", element: <Explore />, errorElement: <ErrorPage /> },
-  { path: "/credit", element: <Credits />, errorElement: <ErrorPage /> },
+  { path: "/", element: <Welcome />, errorElement: <ErrorPage code={404} message={"Uh'oh, page not found!"}/> },
+  { path: "/auth", element: <Auth /> },
+  { path: "/about", element: <About /> },
+  { path: "/explore", element: <Explore />},
+  { path: "/credit", element: <Credits /> },
+  { path: "/setting", element: <Settings /> },
   {
     path: "/home",
     element: (
       <ProtectedRoute>
-        <LoadingScreen child={<Home />} />
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Home />
+        </ErrorBoundary>
       </ProtectedRoute>
     ),
-    errorElement: <ErrorPage />,
     children: [
       {
         path: "convo/:id",
         element: (
-          <ProtectedRoute>
-            <Conversation />
-          </ProtectedRoute>
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <ProtectedRoute>
+              <Conversation />
+            </ProtectedRoute>
+          </ErrorBoundary>
         ),
-        errorElement: <ErrorPage />,
+       errorElement: <ErrorPage code={404} message={"Uh'oh, conversation not found!"}/>,
       },
       {
         path: "srchuser/:mode",
@@ -53,7 +60,16 @@ const appRoutes = createBrowserRouter([
             <UserSearchPage />
           </ProtectedRoute>
         ),
-        errorElement: <ErrorPage />
+        errorElement: <ErrorPage code={404} message={"Uh'oh, requested page was not found!"}/>
+      },
+      {
+        path: "profile/:id/:userId",
+        element: (
+          <ProtectedRoute>
+            <UserProfile />
+          </ProtectedRoute>
+        ),
+        errorElement: <ErrorPage code={404} message={"Uh'oh, requested page was not found!"}/>
       },
     ],
   },
@@ -79,7 +95,7 @@ function App() {
       });
   }, []);
 
-  return <RouterProvider router={appRoutes} onError={errorHandler} />;
+  return <RouterProvider router={appRoutes} onError={errorHandler} useTransitions />;
 }
 
 export default App;

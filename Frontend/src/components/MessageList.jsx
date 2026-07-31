@@ -1,4 +1,4 @@
-import Chat from "./Chat";
+import Chat from "./Chat/Chat";
 import { memo, useEffect, useImperativeHandle } from "react";
 import { useVirtualizer, Virtualizer } from "@tanstack/react-virtual";
 
@@ -70,11 +70,7 @@ return (
                     referenceMessageCreator={msg?.referenceMessageCreator}
                     setReferenceMessage={setReferenceMessage}
                     convoType={conversationContext?.convoType || "group"}
-                    readReceipt={msg.readByAt?.some(
-                        (c) =>
-                        c.readerId === participant?._id ||
-                        c.userId === participant?._id
-                    )}
+                    readReceipt={!!msg.readByAt[participant?._id] || false}
                 />
             </div>
         );

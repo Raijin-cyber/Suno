@@ -1,7 +1,7 @@
 import axios from "axios";
 import store from "../store/store";
 import { AUTH_API } from "../config/config";
-import { login, logout } from "../store/authSlice";
+import { logout } from "../store/authSlice";
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -12,32 +12,57 @@ const api = axios.create({
     }
 });
 
-api.defaults.withCredentials = true;
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error) => {
+    failedQueue.forEach((prom) => {
+        error ? prom.reject(error) : prom.resolve();
+    })
+
+    failedQueue = [];
+}
 
 api.interceptors.response.use(
-    response => response,
+    (response) => response,
     async(error) => {
-        const org_request = error.config;
+        const originalRequest = error.config;
 
-        if(error.response?.status === 403 && !org_request._retry) {
-            org_request._retry = true;
+        if(originalRequest && (error.response?.status === 403 || error.response?.status === 401) && !originalRequest._retry) {
+           
+            if(isRefreshing) {
+                // Queue the request until the refresh completes
+                return new Promise((resolve, reject) => {
+                    failedQueue.push({ 
+                        resolve: () => resolve(api(originalRequest)), 
+                        reject 
+
+                    });
+                })
+            }
+
+            originalRequest._retry = true;
+            isRefreshing = true;
+
             try {
                 await axios.post(AUTH_API.refresh, {}, { withCredentials: true });               
-                const response = await axios.get(AUTH_API.curruser, { withCredentials: true });
-                store.dispatch(login(response.data.userData));
-                return api(org_request);
-
-            } catch (refreshError) {
+                processQueue(null);
+                return api(originalRequest);
+            } 
+            catch (refreshError) {
+                processQueue(refreshError);
+                // redirect to login
                 store.dispatch(logout());
+                // window.location.href = "/auth";
                 return Promise.reject(refreshError);
             }
+            finally {
+                isRefreshing = false;
+            }
+
         }
         
-        if (error.response) {
-            return Promise.reject(error.response.data.message);
-        } else {
-            return Promise.reject(error.message);
-        }
+        return Promise.reject(error);
     }
 )
 

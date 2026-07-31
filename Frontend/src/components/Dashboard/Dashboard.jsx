@@ -1,7 +1,6 @@
 import HelloSky from "./HelloSky";
 import { useSelector } from "react-redux";
 import Ellipsis from "../Ellipsis/Ellipsis";
-import greetUser from "../../utils/greetUser";
 import { resetStore } from "../../store/storeFn";
 import { useSocket } from "../../hooks/useSocket";
 import { logoutUser } from "../../services/authServices";
@@ -11,7 +10,12 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 
 const Silk = lazy(() => import("../../React-Bites Components/Silk"));
 
-const Dashboard = ({ userData=null, setIsNotifiOpen, setQuery, setError }) => {
+const Dashboard = ({ 
+    userData=null, 
+    setIsNotifiOpen, 
+    setQuery, 
+    setError 
+}) => {
     const socket = useSocket();
     const { mode } = useParams();
     const timerRef = useRef(null);
@@ -43,8 +47,10 @@ const Dashboard = ({ userData=null, setIsNotifiOpen, setQuery, setError }) => {
     const logoutHandler = useCallback(() => {
         logoutUser()
         .then(() => {
-            socket.disconnect();      
-            resetStore();           
+            setTimeout(() => {
+                socket.disconnect();      
+                resetStore();
+            }, 5000);           
         })
         .catch((error) => setError(error))
         .finally(() => navigate("/"));
@@ -96,9 +102,9 @@ const Dashboard = ({ userData=null, setIsNotifiOpen, setQuery, setError }) => {
                 <div
                     id="ControlPanel" 
                     className="
-                        absolute top-7 right-2 z-10
-                        rounded-2xl p-2 flex items-center 
-                        gap-x-2 backdrop-blur-[5px] backdrop-saturate-125 
+                        absolute top-7 right-2 z-10 w-fit
+                        rounded-2xl p-2 flex items-center justify-end   
+                        gap-x-2 backdrop-blur-[5px] backdrop-saturate-125 flex-wrap
                         bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.125)]
                     "
                 >
@@ -107,7 +113,27 @@ const Dashboard = ({ userData=null, setIsNotifiOpen, setQuery, setError }) => {
                     <button className="cursor-pointer hover:scale-120 transition-all duration-300 w-8" onClick={logoutHandler}><img className="active:bg-white/20 rounded-full p-1 transition-all duration-75" src="/assets/icons/exit.png" /></button>
 
                     {/* Mute/Unmute button and Notification toggle */}
-                    <div className="cursor-pointer hover:scale-120 transition-all duration-300 w-8"><img onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchStart={handleMouseDown} onTouchEnd={handleMouseUp} onClick={handleClick} className="active:bg-white/20 rounded-full p-1 transition-all duration-75" src={`/assets/icons/${alert ? "ring" : "silent"}.png`} /></div>
+                    <div className="relative cursor-pointer hover:scale-120 transition-all duration-300 w-8">
+                        <img 
+                            onMouseDown={handleMouseDown} 
+                            onMouseUp={handleMouseUp} 
+                            onMouseLeave={handleMouseUp} 
+                            onTouchStart={handleMouseDown} 
+                            onTouchEnd={handleMouseUp} 
+                            onClick={handleClick} 
+                            className="active:bg-white/20 rounded-full p-1 transition-all duration-75" 
+                            src={`/assets/icons/${alert ? "ring" : "silent"}.png`} 
+                        />
+                        <span className="absolute top-1 left-1 border-5 border-red-600 rounded-full"></span>
+                    </div>
+
+                        {/* Feedback Form / Bug Reporting Form */}
+                        <div className="relative cursor-pointer hover:scale-120 transition-all duration-300 w-8">
+                            <img 
+                                className="active:bg-white/20 rounded-full p-1 transition-all duration-75" 
+                                src={`/assets/icons/bug_report.svg`} 
+                            />
+                        </div>
 
                     {/* Settings floating menu */}
                     <div 

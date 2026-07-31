@@ -6,6 +6,7 @@ import MessageComposer from "../components/MessageComposer";
 import TypingIndicator from "../components/TypingIndicator";
 import { emitMarkAsReadEvent } from "../socket/conversation";
 import MirageCustom from "../components/Loaders/MirageCustom";
+import { selectMessagesByConvoId } from "../store/messagesSlice";
 import useFetchMessageBatch from "../hooks/useFetchMessageBatch";
 import ConversationHeader from "../components/ConversationHeader";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
@@ -36,8 +37,8 @@ const Conversation = () => {
       (state) => state.conversations.byId[roomId]?.typingUsers
     );
 
-    const conversationMessages = useSelector(
-      (state) => state.messages.byConversationId[roomId]
+    const conversationMessages = useSelector((state) => 
+      selectMessagesByConvoId(state, roomId)
     ) || [];
 
     const participant = useMemo(() => {
@@ -46,11 +47,9 @@ const Conversation = () => {
       );
     }, [conversationContext, userData]);
 
-    const otherMemberStatus = useMemo(() => {
-      return onlineMembers?.find(
-        m => m.userId !== userData?._id
-      )?.status || "offline";
-    }, [onlineMembers, userData])
+    const otherMember = useMemo(() => {
+      return onlineMembers?.find(m => m.userId !== userData?._id)
+    }, [onlineMembers, userData]);
 
     const {
       trigger: inView,
@@ -164,7 +163,8 @@ const Conversation = () => {
             <ConversationHeader 
               conversationContext={conversationContext}
               participant={participant}
-              otherMemberStatus={otherMemberStatus}
+              otherMemberStatus={otherMember?.status || "offline"}
+              otherMemberLastSeen={otherMember?.lastSeen || ''}
               handleCloseConversation={handleCloseConversation}
             />
         </div>

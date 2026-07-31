@@ -1,14 +1,15 @@
-import { useState, memo, useCallback, useMemo } from "react";
-import Emoji from "./EmojiPicker/Emoji";
+import { useState, memo, useCallback, useMemo, useRef } from "react";
+import ChatContextMenu from "./ChatContextMenu";
+import Emoji from "../EmojiPicker/Emoji";
 
 const emojiRegex =
-  /(\/emojis library\/([^/]+)\/([A-Za-z0-9-]+)_u([a-f0-9_]+)\.json)&([\p{Emoji}\u200d\ufe0f]+)/iu;
+  /(\/emojis-library\/([^/]+)\/([A-Za-z0-9-]+)_u([a-f0-9_]+)\.json)&([\p{Emoji}\u200d\ufe0f]+)/iu;
 
 const Chat = ({
   messageId,
   message,
   creator,
-  readReceipt,
+  readReceipt=false,
   referenceMessage,
   setReferenceMessage,
   referenceMessageCreator,
@@ -16,7 +17,9 @@ const Chat = ({
   isOwn,
   time,
 }) => {
+  const chatContextRef = useRef(null);
   const [showChatControls, setShowChatControls] = useState(false);
+  const [chatContextState, setChatContextState] = useState(false);
 
   // Parse current message
   const parsedMessage = useMemo(() => {
@@ -73,6 +76,10 @@ const Chat = ({
     parsedMessage,
     setReferenceMessage,
   ]);
+
+  const chatContextMenuHandler = useCallback(() => {
+    setChatContextState(prev => !prev);
+  }, []);
 
   const baseClasses =
     "relative flex flex-col justify-between max-w-[90%] lg:max-w-2xl min-w-[5.25rem] px-3 py-2";
@@ -171,10 +178,11 @@ const Chat = ({
       {/* Controls */}
       {showChatControls && (
         <div
-          className={`flex items-center gap-x-2 ${
+          className={`relative flex items-center gap-x-2 ${
             !isOwn && "flex-row-reverse"
           }`}
         >
+          {/* reply */}
           <button
             onClick={referenceMessageSetterHandler}
             className="hover:bg-black/20 rounded-full p-1 transition duration-200 active:bg-black/30"
@@ -186,6 +194,7 @@ const Chat = ({
             />
           </button>
 
+          {/* react */}
           <button className="hover:bg-black/20 rounded-full p-1 transition duration-200 active:bg-black/30">
             <img
               className="max-w-5 min-w-5"
@@ -194,13 +203,23 @@ const Chat = ({
             />
           </button>
 
-          <button className="hover:bg-black/20 rounded-full p-1 transition duration-200 active:bg-black/30">
+          {/* chatContext */}
+          <button 
+            onClick={chatContextMenuHandler}
+            className="hover:bg-black/20 rounded-full p-1 transition duration-200 active:bg-black/30">
             <img
+              ref={chatContextRef}
               className="max-w-5 min-w-5"
               src="/assets/icons/dots_black.png"
-              alt="controls"
+              alt="context"
             />
           </button>
+          <ChatContextMenu
+            chatContextRef={chatContextRef}
+            chatContextState={chatContextState} 
+            setChatContextState={setChatContextState} 
+          />
+
         </div>
       )}
     </div>

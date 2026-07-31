@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 const ROOT = path.resolve(
     __dirname,
-    "../../public/emojis library"
+    "../../public/emojis-library"
 );
 
 const OUTPUT = path.join(
@@ -99,7 +99,7 @@ function walk(dir, category = "") {
             file: fullPath
                 .replace(
                     ROOT,
-                    "/emojis library"
+                    "/emojis-library"
                 )
                 .replace(
                     /\\/g,

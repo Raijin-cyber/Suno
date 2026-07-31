@@ -46,7 +46,7 @@ const HelloSky = ({ userData=null }) => {
             <div className="flex items-start justify-between">
                 <div className="flex flex-col items-start">
                     <span className="block w-full truncate text-[1rem] font-normal tracking-tighter animate-fade-in-up">{greet}</span>
-                    <span className="block w-full truncate font-medium text-[1.5rem] tracking-tighter animate-fade-in-up">{userData?.username}</span>
+                    <span className="block w-full truncate font-medium text-[1.5rem] tracking-tighter animate-fade-in-up">{userData?.name ? userData?.name.split(' ')[0] : userData?.username}</span>
                 </div>
                 <button className={`${helloSkyState ? "animate-fade-in-up" : "hidden"} animate-duration-400 hover:bg-white/20 active:bg-white/20 rounded-full p-1 transition duration-150`} ><img className="w-5" src="/assets/icons/cross.png" alt="cross" /></button>
             </div>

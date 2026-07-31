@@ -31,7 +31,7 @@ const EmojiPicker = ({
             return acc;
         }, {});
     }, [emojis]);
-    
+
     useEffect(() => {
         if(!emoji) return;
         sendMessage(socket, { 
