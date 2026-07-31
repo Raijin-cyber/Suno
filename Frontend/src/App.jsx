@@ -8,7 +8,8 @@ import {
   ErrorPage,
   Credits, 
   Explore,
-  UserProfile
+  UserProfile,
+  Settings
 } from "./pages/pageImports";
 
 import { useEffect } from "react";
@@ -22,7 +23,6 @@ import ErrorFallback from "./components/ErrorFallback";
 import { useDispatch, useSelector } from "react-redux";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { getCurrentUser } from "./services/authServices";
-import LoadingScreen from "./components/Loaders/LoadingScreen";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 const appRoutes = createBrowserRouter([
@@ -31,12 +31,13 @@ const appRoutes = createBrowserRouter([
   { path: "/about", element: <About /> },
   { path: "/explore", element: <Explore />},
   { path: "/credit", element: <Credits /> },
+  { path: "/setting", element: <Settings /> },
   {
     path: "/home",
     element: (
       <ProtectedRoute>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <LoadingScreen child={<Home />} />
+          <Home />
         </ErrorBoundary>
       </ProtectedRoute>
     ),

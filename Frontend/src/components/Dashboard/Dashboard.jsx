@@ -102,9 +102,9 @@ const Dashboard = ({
                 <div
                     id="ControlPanel" 
                     className="
-                        absolute top-7 right-2 z-10
-                        rounded-2xl p-2 flex items-center 
-                        gap-x-2 backdrop-blur-[5px] backdrop-saturate-125 
+                        absolute top-7 right-2 z-10 w-fit
+                        rounded-2xl p-2 flex items-center justify-end   
+                        gap-x-2 backdrop-blur-[5px] backdrop-saturate-125 flex-wrap
                         bg-[rgba(0,0,0,0.5)] border border-[rgba(255,255,255,0.125)]
                     "
                 >
@@ -126,6 +126,14 @@ const Dashboard = ({
                         />
                         <span className="absolute top-1 left-1 border-5 border-red-600 rounded-full"></span>
                     </div>
+
+                        {/* Feedback Form / Bug Reporting Form */}
+                        <div className="relative cursor-pointer hover:scale-120 transition-all duration-300 w-8">
+                            <img 
+                                className="active:bg-white/20 rounded-full p-1 transition-all duration-75" 
+                                src={`/assets/icons/bug_report.svg`} 
+                            />
+                        </div>
 
                     {/* Settings floating menu */}
                     <div 
