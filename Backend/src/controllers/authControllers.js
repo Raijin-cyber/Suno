@@ -45,7 +45,9 @@ const registerUser = asyncHandler(async(req, res, next) => {
         throw new Error("All feilds are required");
     }
 
-    const existingUser = await User.findOne({username: username});
+    const existingUser = await User.findOne({
+        $or: [{ username }, { email }]
+    });
 
     if(existingUser) {
         res.status(409);
@@ -177,7 +179,7 @@ const loginUser = asyncHandler(async(req, res, next) => {
         });
     }   
     else {
-        res.status(401);
+        res.status(400);
         throw new Error("Invalid email or password.");
     }
 });

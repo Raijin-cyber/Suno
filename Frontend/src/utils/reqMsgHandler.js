@@ -15,12 +15,12 @@ const reqMsgHandler = (statusCode) => {
 
     // Client Errors
     case 400: return "Bad Request - Invalid request syntax or parameters";
-    case 401: return "Unauthorized - Authentication required";
+    case 401: return "Unauthorized - Invalid email or password";
     case 403: return "Forbidden - Authenticated but not allowed";
     case 404: return "Not Found - Resource not found";
     case 405: return "Method Not Allowed - HTTP method not supported";
     case 408: return "Request Timeout - Server timed out waiting";
-    case 409: return "Conflict - Request conflicts with current state";
+    case 409: return "Conflict - Record already exists";
     case 410: return "Gone - Resource permanently removed";
     case 413: return "Payload Too Large - Request body too big";
     case 414: return "URI Too Long - URL too long";

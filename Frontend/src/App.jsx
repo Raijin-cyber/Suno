@@ -27,7 +27,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 const appRoutes = createBrowserRouter([
   { path: "/", element: <Welcome />, errorElement: <ErrorPage code={404} message={"Uh'oh, page not found!"}/> },
-  { path: "/auth", element: <Auth /> },
+  { path: "/auth", element: <ErrorBoundary FallbackComponent={ErrorFallback}><Auth /></ ErrorBoundary> },
   { path: "/about", element: <About /> },
   { path: "/explore", element: <Explore />},
   { path: "/credit", element: <Credits /> },

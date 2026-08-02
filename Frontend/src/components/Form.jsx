@@ -9,7 +9,8 @@ const Form = ({
     username, 
     email, 
     password,
-    error 
+    error,
+    setError 
 }) => {
     const [usernameState, setUsernameState] = useState(null);
     const { register, handleSubmit, watch, formState: { errors } } = 
@@ -128,12 +129,36 @@ const Form = ({
             </div>
             
             {/* prompting user to change page */}
-            {username && <p className="text-black/50">Already have an account?<span className="underline hover:text-black active:text-black ml-1 cursor-pointer" onClick={() => onSendAuthMode("login")}>Login</span></p>}
-            {!username && <p className="text-black/50">Don't have an account?<span className="underline hover:text-black active:text-black ml-1 cursor-pointer" onClick={() => onSendAuthMode("createAccount")}>Create</span></p>}
+            {username && 
+                <p className="text-black/50">
+                    Already have an account?
+                    <span 
+                        className="underline hover:text-black active:text-black ml-1 cursor-pointer" 
+                        onClick={() => {
+                            onSendAuthMode("login");    
+                            setError('');
+                        }}>
+                            Login
+                    </span>
+                </p>
+            }
+            {!username && 
+                <p className="text-black/50">
+                    Don't have an account?
+                    <span 
+                        className="underline hover:text-black active:text-black ml-1 cursor-pointer" 
+                        onClick={() => {
+                            onSendAuthMode("createAccount");
+                            setError('');
+                        }}>
+                            Create
+                    </span>
+                </p>
+            }
             
             {/* error */}
             <span className="text-center text-red-800 text-xs font-semibold">
-                {error}
+                {error?.message || error}
             </span>
             
             {/* buttons */}

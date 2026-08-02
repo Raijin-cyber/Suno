@@ -10,7 +10,8 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 
 const Silk = lazy(() => import("../../React-Bites Components/Silk"));
 
-const Dashboard = ({ 
+const Dashboard = ({
+    isUnreadNotification=false, 
     userData=null, 
     setIsNotifiOpen, 
     setQuery, 
@@ -124,7 +125,7 @@ const Dashboard = ({
                             className="active:bg-white/20 rounded-full p-1 transition-all duration-75" 
                             src={`/assets/icons/${alert ? "ring" : "silent"}.png`} 
                         />
-                        <span className="absolute top-1 left-1 border-5 border-red-600 rounded-full"></span>
+                        {isUnreadNotification && <span className="absolute top-1 left-1 border-5 border-red-600 rounded-full"></span>}
                     </div>
 
                         {/* Feedback Form / Bug Reporting Form */}

@@ -1,3 +1,4 @@
+import getAxiosErrorMessage from "../utils/getAxiosErrorMessage";
 import { USER_CONVERSATION_API } from "../config/config";
 import api from "../utils/axios";
 
@@ -9,8 +10,7 @@ const fetchUserConversationDetails = async ({ userId, convoId }) => {
     );
     return response.data.userConvo;
   } catch (error) {
-    console.error("Error fetching user details for this conversation.", error.message);
-    throw error;
+    throw new Error(getAxiosErrorMessage(error));
   }
 };
 
@@ -31,8 +31,7 @@ const updateUserConversationDetails = async ({ userId, convoId, role, lastReadAt
 
     return response.data; // return updated object
   } catch (error) {
-    console.error("Error updating user details for this conversation.", error.message);
-    throw error;
+    throw new Error(getAxiosErrorMessage(error));
   }
 };
 

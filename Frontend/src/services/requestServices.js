@@ -1,3 +1,4 @@
+import getAxiosErrorMessage from "../utils/getAxiosErrorMessage";
 import { REQUEST_API } from "../config/config";
 import api from "../utils/axios";
 
@@ -5,10 +6,9 @@ import api from "../utils/axios";
 const sendRequest = async(senderID, receiverID) => {
     try {
         const response = await api.post(REQUEST_API.send, { senderID, receiverID }, { withCredentials: true });
-        return response.data;
+        return response.data.result;
     } catch (error) {
-        console.error("Error sending request: ", error);
-        return error;
+        throw new Error(getAxiosErrorMessage(error));
     }
 }
 
@@ -18,8 +18,7 @@ const acceptRequest = async(requestID) => {
         const response = await api.put(REQUEST_API.accept, { requestID }, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error accepting request: ", error.message);
-        return error;
+        throw new Error(getAxiosErrorMessage(error));
     }
 }
 
@@ -28,8 +27,7 @@ const getRequestStatus = async() => {
         const response = await api.get(REQUEST_API.status, { withCredentials: true });
         return response.data.result;
     } catch (error) {
-        console.error("Error getting request status", error.message);
-        return error;
+        throw new Error(getAxiosErrorMessage(error));
     }
 }
 
@@ -39,8 +37,7 @@ const deleteRequest = async(requestId, userID) => {
         const response = await api.delete(REQUEST_API.delete, { requestId, userID }, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error deleting request: ", error.message);
-        return error;
+        throw new Error(getAxiosErrorMessage(error));
     }
 }
 

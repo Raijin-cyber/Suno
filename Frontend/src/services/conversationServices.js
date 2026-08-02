@@ -1,3 +1,4 @@
+import getAxiosErrorMessage from "../utils/getAxiosErrorMessage";
 import { CONVO_API } from "../config/config";
 import api from "../utils/axios";
 
@@ -8,8 +9,7 @@ const createConversation = async(convoType, userB_ID, participants_ID) => {
         const response = await api.post(CONVO_API.create, { convoType, userB_ID, participants_ID }, { withCredentials: true });
         return response.data.conversation;
     } catch (error) {
-        console.error("Error creating the conversation", error.message);
-        return error;
+        throw new Error(getAxiosErrorMessage(error));
     }
 }
 
@@ -19,8 +19,7 @@ const getAllUserConversation = async() => {
         const response = await api.post(CONVO_API.get, {}, { withCredentials: true });
         return response.data.conversations;
     } catch (error) {
-        console.error("Error getting user's conversations", error.message);
-        return error;
+        throw new Error(getAxiosErrorMessage(error));
     }
 }
 

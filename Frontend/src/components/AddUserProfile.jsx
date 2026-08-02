@@ -1,5 +1,7 @@
 import { useCallback, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { sendRequest } from "../services/requestServices";
+import { sendNotification } from "../services/notificationServices";
 
 const AddUserProfile = ({
     userData,
@@ -18,14 +20,17 @@ const AddUserProfile = ({
     const handleProfileNavigation = useCallback(() => {
         navigate();
     }, []);
-    const requestHandler = useCallback(async () => {
+    const requestHandler = useCallback(() => {
         sendRequest(userData?._id, recipientID)
             .then((res) => {
-                const requestId = res?.result._id;
-                setRequestBtnState(true);
-                sendNotification(recipientID, "request", requestId).then(() =>
-                    setRequestBtnState(false)
-                );
+                const requestId = res?._id;
+                sendNotification(recipientID, "request", requestId).then(() => {
+                    setIsAdded(true);
+                })
+                .catch((e) => {
+                    setIsAdded(false);
+                    setError(e);
+                });
             })
             .catch((error) => setError(error));
     }, [userData, recipientID, setError]);
@@ -71,7 +76,7 @@ const AddUserProfile = ({
 
                 {/* add user button */}
                 <button
-                    onClick={() => setIsAdded(prev => !prev)} 
+                    onClick={requestHandler} 
                     disabled={isAdded}
                     className={`
                         w-10 h-10 rounded-full 

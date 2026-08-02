@@ -56,6 +56,7 @@ const reactions = [
 
 const Auth = () => {
     const [message, setMessage] = useState(() => reactions[Math.floor((Math.random() * reactions.length))]);
+    const status = useSelector((state) => state.auth?.status);
     const [authMode, setAuthMode] = useState("login");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -63,8 +64,6 @@ const Auth = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const socket = useSocket();
-
-    const status = useSelector((state) => state.auth?.status);
 
     // check if user had any prev sessions.
     useEffect(() => {
@@ -75,7 +74,7 @@ const Auth = () => {
         dispatch(login({ userData }));
         if (!socket.connected) socket.connect();
         navigate("/home");
-    }, []);
+    });
 
     const registerFormHandler = useCallback(async({ username, email, password }) => {
         setIsLoading(true);
@@ -83,16 +82,15 @@ const Auth = () => {
         try {
             const user = await registerUser(username, email, password);
             console.log(user)
-            if(user.status === 200) {
+            // execute this when user didn't return
+            if(user?.status === 200) {
                 const res = await loginUser(email, password);
                 completeAuth(res?.data?.userData);
                 return;
             }
-            else {
-                throw new Error("Something went wrong!");
-            }
+            throw new Error("Something went wrong!");
         } catch (err) {
-            setError(err.status ? reqMsgHandler(err.status) : err);
+            setError(err?.status ? reqMsgHandler(err?.status) : err);
         } finally {
             setIsLoading(false);
         }
@@ -199,6 +197,7 @@ const Auth = () => {
                             email
                             password
                             error={error}
+                            setError={setError}
                         />
 
                         {/* OAuth Logins */}

@@ -1,3 +1,4 @@
+import getAxiosErrorMessage from "../utils/getAxiosErrorMessage";
 import { MESSAGE_API } from "../config/config";
 import api from "../utils/axios";
 
@@ -8,8 +9,7 @@ const storeMessage = async({ id, encryptedMessage, referenceMessageId }) => {
         const response = await api.post(`${MESSAGE_API.create}/${id}/create`, { encryptedMessage, referenceMessageId }, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error storing messages on the database", error);
-        return error;
+        throw new Error(getAxiosErrorMessage(error));
     }
 }
 
@@ -20,8 +20,7 @@ const fetchMessage = async(id, limit, lastMessageId) => {
         const response = await api.get(`${MESSAGE_API.get}/${id}/get/?lastMessageId=${lastMessageId}&limit=${limit}`, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error fetching messages from the database", error.message);
-        return error;
+        throw new Error(getAxiosErrorMessage(error));
     }
 }
 
@@ -32,8 +31,7 @@ const fetchUnreadMessage = async(id) => {
         const response = await api.get(`${MESSAGE_API.getUnread}/${id}/unrd-msg`, { withCredentials: true });
         return response.data.unreadMessages;
     } catch (error) {
-        console.error("Error fetching unread messages", error.message);
-        return error;
+        throw new Error(getAxiosErrorMessage(error));
     }
 }
 
@@ -44,8 +42,7 @@ const markAsReadMessage = async(messageId, readerId, readerUsername, readTime) =
         const response = await api.patch(MESSAGE_API.read, { messageId, readerId, readerUsername, readTime }, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error marking messages as read", error.message);
-        return error;
+        throw new Error(getAxiosErrorMessage(error));
     }
 }
 
@@ -56,8 +53,7 @@ const updateMessage = async(id, msgId, newEncryptedMessage) => {
         const response = await api.put(`${MESSAGE_API.update}/${id}/update/${msgId}`, { newEncryptedMessage }, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error updating message on the database", error.message);
-        return error;
+        throw new Error(getAxiosErrorMessage(error));
     }
 }
 
@@ -68,8 +64,7 @@ const deleteMessage = async(id, msgId) => {
         const response = await api.delete(`${MESSAGE_API.delete}/${id}/delete/${msgId}`, { withCredentials: true });
         return response.data;
     } catch (error) {
-        console.error("Error deleting message on the database", error.message);
-        return error;
+        throw new Error(getAxiosErrorMessage(error));
     }
 }
 

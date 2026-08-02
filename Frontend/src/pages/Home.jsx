@@ -32,12 +32,13 @@ const Home = () => {
     
     // Error variable for storing error state
     const [error, setError] = useState(null);
+
+    // Debounce logic for querying
+    const [query, setQuery] = useState(null);
     
     // states regarding conversation pane
     const isConversationOpen = !!id
     const showPlaceholder = !isConversationOpen && screenWidth >= 768;
-
-    const [query, setQuery] = useState(null);
 
     // mounting necessarry listeners
     useMountListeners();
@@ -61,6 +62,9 @@ const Home = () => {
         loading: notificationLoading, 
         refresh: notificationsRefresh
     } = useNotifications();
+
+    // check for unread notification
+    const isUnreadNotification = useMemo(() => notifications.includes(n => n.status === "unread"), [notifications]);
 
     // cache the conversations data
     const convoData = useMemo(() => {
@@ -91,13 +95,13 @@ const Home = () => {
     return (
         <div className="h-screen flex relative">
             {/* Conversations pane */}
-            <div id="left pane" className="relative h-screen flex flex-col gap-y-5 px-4 py-3 w-full md:w-[40%] lg:w-[30%]">
+            <div id="left pane" className="relative h-screen flex flex-col gap-y-5 px-4 py-3 w-full md:w-[46%] lg:w-[35%]">
                 
                 {/* Notification */}
                 <Notification errorMessage={error} />
 
                 {/* Dashboard */}
-                <Dashboard userData={userData} setIsNotifiOpen={setIsNotifiOpen} setQuery={setQuery} setError={setError} />
+                <Dashboard userData={userData} setIsNotifiOpen={setIsNotifiOpen} setQuery={setQuery} setError={setError} isUnreadNotification={isUnreadNotification} />
 
                 {/* Chat Snippet List */}
                 <div className="h-full scrollbar-hide relative overflow-auto overflow-x-hidden rounded-xl p-4 bg-[#fc94af] shadow-[inset_6px_6px_5px_#de829a,inset_-6px_-6px_5px_#ffa6c4]">
@@ -182,6 +186,7 @@ const Home = () => {
                     isNotifiOpen={isNotifiOpen}  
                     setIsNotifiOpen={setIsNotifiOpen}
                     notifications={notifications}
+                    converastionRefresh={converastionRefresh}
                 />
 
             </div>
